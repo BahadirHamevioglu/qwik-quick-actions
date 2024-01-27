@@ -69,6 +69,7 @@ export const QuickActions = component$(() => {
   const focusedIndex = useSignal<number>(0);
   const input = useSignal<string>("");
   const searchResults = useSignal<any[]>([]);
+  const animationType = useSignal<string>("slide");
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
@@ -138,8 +139,14 @@ export const QuickActions = component$(() => {
     <TransitionIf
       if={isOpen.value}
       class="quick-actions"
-      enter="quick-actions-animations-enter"
-      exit="quick-actions-animations-exit"
+      enter={
+        "quick-actions-animations-enter" +
+        (animationType.value ? "-" + animationType.value : "")
+      }
+      exit={
+        "quick-actions-animations-exit" +
+        (animationType.value ? "-" + animationType.value : "")
+      }
     >
       <div class="quick-actions-head">
         <TextInput value={input.value} onInput$={onInput$} />
