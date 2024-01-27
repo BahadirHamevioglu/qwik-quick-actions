@@ -1,6 +1,5 @@
 import { component$, useStylesScoped$ } from "@builder.io/qwik";
 import { SearchIcon } from "../icons/search-icon/search-icon";
-import { InfoIcon } from "../icons/info-icon/info-icon";
 import styles from "./text-input.scss?inline";
 
 interface TextInputProps {
@@ -24,9 +23,6 @@ export const TextInput = component$<TextInputProps>((props: TextInputProps) => {
         value={props.value} // Directly bind props value
         {...(props.onInput$ && { onInput$: props.onInput$ })} // Conditionally spread the onInput$ handler
       />
-      <div>
-        <InfoIcon width={20} height={20} color="var(--icon-400)" />
-      </div>
     </label>
   );
 });
