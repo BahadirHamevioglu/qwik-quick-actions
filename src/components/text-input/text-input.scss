@@ -1,0 +1,37 @@
+@import '../../assets/styles/presets/typography.scss';
+
+.text-input {
+  &-wrapper {
+    width: 100%;
+    height: max-content;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    background-color: var(--bg-0);
+    border-bottom: 1px solid var(--stroke-200);
+    border-radius: 16px 16px 0px 0px;
+
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  &-text-area {
+    width: 100%;
+    height: 100%;
+
+    color: var(--text-900);
+    background-color: transparent;
+    border: none;
+    outline: none;
+
+    display: flex;
+    flex: 1;
+
+    @extend %paragraph-small;
+
+    &:placeholder {
+      color: var(--text-200);
+    }
+  }
+}

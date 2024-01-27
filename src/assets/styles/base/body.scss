@@ -1,0 +1,46 @@
+:root {
+  font-family: "Inter", sans-serif;
+  font-feature-settings:
+    "ss11" on,
+    "cv09" on,
+    "liga" off,
+    "calt" off;
+}
+@supports (font-variation-settings: normal) {
+  :root {
+    font-family: "InterVariable", sans-serif;
+    font-optical-sizing: auto;
+    font-feature-settings:
+      "ss11" on,
+      "cv09" on,
+      "liga" off,
+      "calt" off;
+  }
+}
+
+body {
+  overflow-y: auto;
+  overscroll-behavior: none;
+
+  width: 100%;
+  height: 100%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  position: relative;
+}
+
+section,
+.footer {
+  content-visibility: auto;
+}
+
+*:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}

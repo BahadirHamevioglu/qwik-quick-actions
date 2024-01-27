@@ -1,0 +1,18 @@
+@import "../../assets/styles/presets/shadows.scss";
+
+.key-icon {
+  width: max-content;
+  height: max-content;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px;
+
+  border-radius: 96px;
+  border: 1px solid var(--stroke-200);
+  background: var(--bg-0);
+
+  @extend %shadow-x-small;
+}

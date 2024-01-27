@@ -1,0 +1,17 @@
+@use "sass:list";
+
+$common-easing: cubic-bezier(0.6, 0.6, 0, 1);
+
+@mixin transition($keys, $duration: 200ms) {
+  $transition: ();
+
+  @each $key in $keys {
+    $transition: list.append(
+      $transition,
+      $key $duration $common-easing,
+      $separator: comma
+    );
+  }
+
+  transition: $transition;
+}

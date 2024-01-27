@@ -1,0 +1,56 @@
+@mixin font-face($family, $style, $weight, $file-name) {
+  @font-face {
+    font-family: $family;
+    font-style: $style;
+    font-weight: $weight;
+    font-display: swap;
+    src: url("../../../../public/fonts/#{$file-name}.woff2") format("woff2");
+  }
+}
+
+@include font-face("InterVariable", normal, 100 900, "InterVariable");
+@include font-face("InterVariable", italic, 100 900, "InterVariable-Italic");
+
+/* static fonts */
+@include font-face("Inter", normal, 100, "Inter-Thin");
+@include font-face("Inter", italic, 100, "Inter-ThinItalic");
+@include font-face("Inter", normal, 200, "Inter-ExtraLight");
+@include font-face("Inter", italic, 200, "Inter-ExtraLightItalic");
+@include font-face("Inter", normal, 300, "Inter-Light");
+@include font-face("Inter", italic, 300, "Inter-LightItalic");
+@include font-face("Inter", normal, 400, "Inter-Regular");
+@include font-face("Inter", italic, 400, "Inter-Italic");
+@include font-face("Inter", normal, 500, "Inter-Medium");
+@include font-face("Inter", italic, 500, "Inter-MediumItalic");
+@include font-face("Inter", normal, 600, "Inter-SemiBold");
+@include font-face("Inter", italic, 600, "Inter-SemiBoldItalic");
+@include font-face("Inter", normal, 700, "Inter-Bold");
+@include font-face("Inter", italic, 700, "Inter-BoldItalic");
+@include font-face("Inter", normal, 800, "Inter-ExtraBold");
+@include font-face("Inter", italic, 800, "Inter-ExtraBoldItalic");
+@include font-face("Inter", normal, 900, "Inter-Black");
+@include font-face("Inter", italic, 900, "Inter-BlackItalic");
+
+@include font-face("InterDisplay", normal, 100, "InterDisplay-Thin");
+@include font-face("InterDisplay", italic, 100, "InterDisplay-ThinItalic");
+@include font-face("InterDisplay", normal, 200, "InterDisplay-ExtraLight");
+@include font-face(
+  "InterDisplay",
+  italic,
+  200,
+  "InterDisplay-ExtraLightItalic"
+);
+@include font-face("InterDisplay", normal, 300, "InterDisplay-Light");
+@include font-face("InterDisplay", italic, 300, "InterDisplay-LightItalic");
+@include font-face("InterDisplay", normal, 400, "InterDisplay-Regular");
+@include font-face("InterDisplay", italic, 400, "InterDisplay-Italic");
+@include font-face("InterDisplay", normal, 500, "InterDisplay-Medium");
+@include font-face("InterDisplay", italic, 500, "InterDisplay-MediumItalic");
+@include font-face("InterDisplay", normal, 600, "InterDisplay-SemiBold");
+@include font-face("InterDisplay", italic, 600, "InterDisplay-SemiBoldItalic");
+@include font-face("InterDisplay", normal, 700, "InterDisplay-Bold");
+@include font-face("InterDisplay", italic, 700, "InterDisplay-BoldItalic");
+@include font-face("InterDisplay", normal, 800, "InterDisplay-ExtraBold");
+@include font-face("InterDisplay", italic, 800, "InterDisplay-ExtraBoldItalic");
+@include font-face("InterDisplay", normal, 900, "InterDisplay-Black");
+@include font-face("InterDisplay", italic, 900, "InterDisplay-BlackItalic");

@@ -1,0 +1,9 @@
+@import "../../assets/styles/presets/typography.scss";
+
+.action-list-group-title {
+  @extend %subheading-xx-small;
+  color: var(--text-400);
+
+  padding: 0 6px;
+  margin-bottom: 8px;
+}

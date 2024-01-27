@@ -1,0 +1,101 @@
+@mixin typography(
+  $font-size,
+  $font-weight,
+  $line-height,
+  $letter-spacing,
+  $font-family
+) {
+  font-size: $font-size;
+  font-weight: $font-weight;
+  line-height: $line-height;
+  letter-spacing: $letter-spacing;
+  font-family: $font-family, sans-serif !important;
+}
+
+// TITLES
+%title-h1 {
+  @include typography(56px, 500, 64px, -0.56px, "Inter Display");
+}
+
+%title-h2 {
+  @include typography(48px, 500, 56px, -0.48px, "Inter Display");
+}
+
+%title-h3 {
+  @include typography(40px, 500, 48px, -0.4px, "Inter Display");
+}
+
+%title-h4 {
+  @include typography(32px, 500, 40px, 0px, "Inter Display");
+}
+
+%title-h5 {
+  @include typography(24px, 500, 32px, 0px, "Inter Display");
+}
+
+%title-h6 {
+  @include typography(20px, 500, 28px, 0px, "Inter Display");
+}
+
+// LABELS
+%label-x-large {
+  @include typography(24px, 500, 32px, -0.36px, "Inter");
+}
+
+%label-large {
+  @include typography(18px, 500, 24px, -0.27px, "Inter");
+}
+
+%label-medium {
+  @include typography(16px, 500, 24px, -0.084px, "Inter");
+}
+
+%label-small {
+  @include typography(14px, 500, 18px, -0.176px, "Inter");
+}
+
+%label-x-small {
+  @include typography(12px, 500, 16px, 0px, "Inter");
+}
+
+// PARAGRAPHS
+%paragraph-x-large {
+  @include typography(24px, 400, 32px, -0.36px, "Inter");
+}
+
+%paragraph-large {
+  @include typography(18px, 400, 24px, -0.27px, "Inter");
+}
+
+%paragraph-medium {
+  @include typography(16px, 400, 24px, -0.176px, "Inter");
+}
+
+%paragraph-small {
+  @include typography(14px, 400, 20px, -0.084px, "Inter");
+}
+
+%paragraph-x-small {
+  @include typography(12px, 400, 16px, 0px, "Inter");
+}
+
+// SUBHEADINGS
+%subheading-medium {
+  @include typography(16px, 500, 24px, 0.96px, "Inter");
+  text-transform: uppercase;
+}
+
+%subheading-small {
+  @include typography(14px, 500, 20px, 0.84px, "Inter");
+  text-transform: uppercase;
+}
+
+%subheading-x-small {
+  @include typography(12px, 500, 16px, 0.48px, "Inter");
+  text-transform: uppercase;
+}
+
+%subheading-xx-small {
+  @include typography(11px, 500, 12px, 0.22px, "Inter");
+  text-transform: uppercase;
+}

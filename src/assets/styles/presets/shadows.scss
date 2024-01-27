@@ -1,0 +1,28 @@
+@mixin shadow($x-offset, $y-offset, $blur-radius, $spread-radius, $color) {
+  box-shadow: $x-offset $y-offset $blur-radius $spread-radius $color;
+}
+
+// GÖLGELER
+%shadow-x-small {
+  @include shadow(0px, 1px, 2px, 0px, rgba(228, 229, 231, 0.24));
+}
+
+%shadow-small {
+  @include shadow(0px, 2px, 4px, 0px, rgba(27, 28, 29, 0.04));
+}
+
+%shadow-medium {
+  @include shadow(0px, 16px, 32px, -12px, rgba(88, 92, 95, 0.1));
+}
+
+%shadow-large {
+  @include shadow(0px, 16px, 40px, -8px, rgba(88, 92, 95, 0.16));
+}
+
+%shadow-x-large {
+  @include shadow(0px, 24px, 56px, -4px, rgba(88, 92, 95, 0.16));
+}
+
+%shadow-xx-large {
+  @include shadow(0px, 40px, 96px, -8px, rgba(88, 92, 95, 0.2));
+}
