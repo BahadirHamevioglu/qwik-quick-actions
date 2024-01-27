@@ -7,10 +7,9 @@ interface ActionListGroupItemProps {
   icon?: any;
   label: string;
   shortcut?: string;
-  as: "a" | "button";
   href?: string;
 
-  onClick$?: () => void;
+  onSelect$?: () => void;
   role?: string;
 
   isFocused?: boolean;
@@ -20,13 +19,10 @@ export const ActionListGroupItem = component$(
   (props: ActionListGroupItemProps) => {
     const { isFocused } = props;
     useStylesScoped$(styles);
-    const Tag = props.as === "button" ? "button" : "a";
-    const tagProps = Tag === "button" ? {} : { href: props.href };
 
     return (
-      <Tag
-        {...tagProps}
-        onClick$={props.onClick$}
+      <div
+        onClick$={props.onSelect$}
         class={`
         action-list-group-item ${isFocused ? "action-list-group-item-focused" : ""}
         `}
@@ -40,7 +36,7 @@ export const ActionListGroupItem = component$(
         {props.role && (
           <div class="action-list-group-item-role">{props.role}</div>
         )}
-      </Tag>
+      </div>
     );
   }
 );

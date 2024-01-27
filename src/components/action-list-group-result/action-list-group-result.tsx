@@ -11,11 +11,10 @@ interface ActionListGroupResultProps {
 
 interface ActionListGroupResultItemProps {
   label: string;
-  as: "a" | "button";
   href: string;
   role: string;
   icon: string;
-  onClick$: () => void;
+  onSelect$: () => void;
   focusedItemIndex: number;
 }
 
@@ -30,13 +29,10 @@ export const ActionListGroupResult = component$<ActionListGroupResultProps>(
           <ActionListGroupItem
             key={item.label}
             label={item.label}
-            as={item.as}
             role={item.role}
             icon={item.icon}
             isFocused={item.focusedItemIndex === index}
-            {...(item.as === "a"
-              ? { href: item.href }
-              : { onClick$: item.onClick$ })}
+            onSelect$={item.onSelect$}
           />
         ))}
       </div>

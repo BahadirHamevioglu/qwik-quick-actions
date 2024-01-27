@@ -2,7 +2,6 @@ import {
   component$,
   useStyles$,
   $,
-  useVisibleTask$,
   useOnWindow,
   useSignal,
 } from "@builder.io/qwik";
@@ -24,15 +23,14 @@ const actionGroups = [
     actions: [
       {
         label: "Sign in",
-        as: "a",
-        href: "/sign-in",
         role: "link",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
+        onSelect$: $(() => {
+          console.log("Search for action...");
+        }),
       },
       {
         label: "Sign up",
-        as: "a",
-        href: "/sign-up",
         role: "link",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
       },
@@ -47,7 +45,7 @@ const actionGroups = [
         as: "button",
         role: "command",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
-        onClick$: $(() => {
+        onSelect$: $(() => {
           console.log("Search for action...");
         }),
       },
@@ -65,38 +63,25 @@ export const QuickActions = component$(() => {
   useStyles$(styles);
 
   const isOpen = useSignal<boolean>(true);
-  const isAnimating = useSignal<boolean>(false);
   const focusedIndex = useSignal<number>(0);
   const input = useSignal<string>("");
   const searchResults = useSignal<any[]>([]);
   const animationType = useSignal<string>("slide");
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.metaKey && event.code === "KeyK") {
-        event.preventDefault();
-        isOpen.value = !isOpen.value;
-
-        console.log(isOpen.value);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  });
-
   // Keydown handler
   useOnWindow(
     "keydown",
     $((event) => {
+      if (event.metaKey && event.code === "KeyK") {
+        event.preventDefault();
+        isOpen.value = !isOpen.value;
+      }
+
       if (event.code === "Escape") {
         if (input.value.length > 0 && isOpen.value) {
           event.preventDefault();
           input.value = "";
-        } else if (isOpen.value && !isAnimating.value) {
+        } else if (isOpen.value) {
           event.preventDefault();
           // Close the quick actions if open
           isOpen.value = false;
@@ -106,10 +91,13 @@ export const QuickActions = component$(() => {
       if (event.code === "ArrowUp") {
         event.preventDefault();
         // Handle ArrowUp event if needed
+        isOpen.value = false;
+        console.log("ArrowUp");
       }
 
       if (event.code === "ArrowDown") {
         event.preventDefault();
+        isOpen.value = true;
         // Handle ArrowDown event if needed
       }
     })
@@ -121,7 +109,7 @@ export const QuickActions = component$(() => {
     $((event) => {
       const target = event.target as HTMLElement;
       if (!target.closest(".quick-actions")) {
-        if (isOpen.value && !isAnimating.value) {
+        if (isOpen.value) {
           isOpen.value = false;
         }
       }
@@ -163,12 +151,12 @@ export const QuickActions = component$(() => {
         {/* Results */}
         {searchResults.value.length > 0 && (
           <div class="action-list">
-            {searchResults.value.flatMap((result, index) => {
+            {searchResults.value.map((result, index) => {
               return (
                 <ActionListGroupResult
                   key={result.item.title}
                   title={result.item.title}
-                  items={result.item.actions.flatMap((action: any) => ({
+                  items={result.item.actions.map((action: any) => ({
                     ...action,
                     focusedItemIndex: focusedIndex.value === index ? index : -1,
                   }))}

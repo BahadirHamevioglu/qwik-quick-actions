@@ -9,10 +9,9 @@ interface ActionListProps extends ComponentBaseProps {
     title: string;
     actions: Array<{
       label: string;
-      as: any;
       role?: string;
       icon?: any;
-      onClick$?: () => void;
+      onSelect$?: () => void;
       focusedItemIndex?: number;
     }>;
   }>;

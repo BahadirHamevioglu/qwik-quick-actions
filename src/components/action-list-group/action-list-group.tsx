@@ -8,10 +8,9 @@ interface ActionListGroupProps {
 
   actions: Array<{
     label: string;
-    as: "a" | "button";
     role?: string;
     icon?: any;
-    onClick$?: () => void;
+    onSelect$?: () => void;
     focusedItemIndex?: number;
   }>;
 }
@@ -28,13 +27,10 @@ export const ActionListGroup = component$<ActionListGroupProps>(
             <ActionListGroupItem
               key={key}
               label={action.label}
-              as={action.as}
               role={action.role}
               icon={action.icon && action.icon}
               isFocused={action.focusedItemIndex === index}
-              {...(action.as === "a"
-                ? { href: action.href }
-                : { onClick$: action.onClick$ })}
+              onSelect$={action.onSelect$}
             />
           );
         })}
