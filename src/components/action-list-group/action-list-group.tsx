@@ -23,9 +23,10 @@ export const ActionListGroup = component$<ActionListGroupProps>(
       <div class="action-list-group">
         <ActionListGroupTitle title={props.title} />
         {props.actions.map((action: any, index: number) => {
+          const key = `${action.label}-${index}`;
           return (
             <ActionListGroupItem
-              key={action.label}
+              key={key}
               label={action.label}
               as={action.as}
               role={action.role}

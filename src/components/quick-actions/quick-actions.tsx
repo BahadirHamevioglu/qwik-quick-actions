@@ -1,9 +1,10 @@
 import {
   component$,
-  useStylesScoped$,
-  useStore,
+  useStyles$,
   $,
   useVisibleTask$,
+  useOnWindow,
+  useSignal,
 } from "@builder.io/qwik";
 import styles from "./quick-actions.scss?inline";
 import Fuse from "fuse.js";
@@ -15,6 +16,8 @@ import { ActionList } from "../action-list/action-list";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
 import { ActionListGroupResult } from "../action-list-group-result/action-list-group-result";
 
+import TransitionIf from "../../utils/transition-if";
+
 const actionGroups = [
   {
     title: "Links",
@@ -23,6 +26,13 @@ const actionGroups = [
         label: "Sign in",
         as: "a",
         href: "/sign-in",
+        role: "link",
+        icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
+      },
+      {
+        label: "Sign up",
+        as: "a",
+        href: "/sign-up",
         role: "link",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
       },
@@ -52,93 +62,115 @@ const fuse = new Fuse(actionGroups, {
 });
 
 export const QuickActions = component$(() => {
-  useStylesScoped$(styles);
+  useStyles$(styles);
 
-  const store = useStore({
-    input: "",
-    searchResults: [] as any[],
-    contentHeight: "auto",
-    isLoading: false,
+  const isOpen = useSignal<boolean>(true);
+  const isAnimating = useSignal<boolean>(false);
+  const focusedIndex = useSignal<number>(0);
+  const input = useSignal<string>("");
+  const searchResults = useSignal<any[]>([]);
 
-    focusedIndex: 0,
-  });
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "Escape": {
-          event.preventDefault();
-          if (store.input.length > 0) {
-            store.input = "";
-            store.searchResults = [];
-          }
-          if (store.input.length === 0) {
-            // Hide the quick actions
-          }
-          break;
-        }
-        case "ArrowDown": {
-          event.preventDefault();
+      if (event.metaKey && event.code === "KeyK") {
+        event.preventDefault();
+        isOpen.value = !isOpen.value;
 
-          break;
-        }
-        case "ArrowUp": {
-          event.preventDefault();
-          break;
-        }
-        case "Enter": {
-          event.preventDefault();
-          break;
-        }
+        console.log(isOpen.value);
       }
     };
+    window.addEventListener("keydown", handleKeyDown);
 
-    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   });
+
+  // Keydown handler
+  useOnWindow(
+    "keydown",
+    $((event) => {
+      if (event.code === "Escape") {
+        if (input.value.length > 0 && isOpen.value) {
+          event.preventDefault();
+          input.value = "";
+        } else if (isOpen.value && !isAnimating.value) {
+          event.preventDefault();
+          // Close the quick actions if open
+          isOpen.value = false;
+        }
+      }
+
+      if (event.code === "ArrowUp") {
+        event.preventDefault();
+        // Handle ArrowUp event if needed
+      }
+
+      if (event.code === "ArrowDown") {
+        event.preventDefault();
+        // Handle ArrowDown event if needed
+      }
+    })
+  );
+
+  // Click handler
+  useOnWindow(
+    "click",
+    $((event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".quick-actions")) {
+        if (isOpen.value && !isAnimating.value) {
+          isOpen.value = false;
+        }
+      }
+    })
+  );
 
   // onInput handler
   const onInput$ = $((event: any) => {
-    store.input = event.target.value;
-    const results = store.input ? fuse.search(store.input) : [];
-    store.searchResults = results;
-    // Calculate the height based on the number of search results
-    store.contentHeight = results.length ? `${results.length * 50}px` : "auto"; // Assuming each item is 50px tall
+    input.value = event.target.value;
+    const results = input.value ? fuse.search(input.value) : [];
+    searchResults.value = results;
   });
 
   return (
-    <div class="quick-actions">
+    <TransitionIf
+      if={isOpen.value}
+      class="quick-actions"
+      enter="quick-actions-animations-enter"
+      exit="quick-actions-animations-exit"
+    >
       <div class="quick-actions-head">
-        <TextInput value={store.input} onInput$={onInput$} />
+        <TextInput value={input.value} onInput$={onInput$} />
       </div>
       <div class="quick-actions-content">
-        {/* No results, not loading, and no input */}
-        {store.searchResults.length === 0 &&
-          !store.isLoading &&
-          store.input.length === 0 && (
-            <ActionList actionGroups={actionGroups} />
-          )}
-        {/* No results, not loading, and input */}
-        {store.searchResults.length === 0 && store.input.length > 0 && (
+        {/* No results, and no input */}
+        {searchResults.value.length === 0 && input.value.length === 0 && (
+          <ActionList actionGroups={actionGroups} />
+        )}
+        {/* No results, and input */}
+        {searchResults.value.length === 0 && input.value.length > 0 && (
           <ActionListGroupNoResult />
         )}
         {/* Results */}
-        {store.searchResults.length > 0 && (
+        {searchResults.value.length > 0 && (
           <div class="action-list">
-            {store.searchResults.map((result) => {
+            {searchResults.value.flatMap((result, index) => {
               return (
                 <ActionListGroupResult
                   key={result.item.title}
                   title={result.item.title}
-                  items={result.item.actions}
+                  items={result.item.actions.flatMap((action: any) => ({
+                    ...action,
+                    focusedItemIndex: focusedIndex.value === index ? index : -1,
+                  }))}
                 />
               );
             })}
           </div>
         )}
       </div>
-    </div>
+    </TransitionIf>
   );
 });
