@@ -2,18 +2,6 @@ import {
   Component, QRL
 } from "@builder.io/qwik";
 
-// quick-actions.tsx
-export interface QuickActionsProps {
-  isOpen?: boolean;
-  animationType?: string;
-  actionGroups: GroupFromProps[];
-}
-
-export interface GroupFromProps {
-  title: string;
-  actions: Omit<Action, 'index'>[];
-}
-
 export interface Group {
   title: string;
   actions: Action[];

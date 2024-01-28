@@ -10,8 +10,8 @@ import {
 import Fuse from "fuse.js";
 
 import globalStyles from '@/assets/styles/main.scss?inline';
+import { Action } from "@/types/types";
 
-import { QuickActionsProps } from "../../types/types";
 import TransitionIf from "../../utils/transition-if";
 import { ActionListGroup } from "../action-list-group/action-list-group";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
@@ -19,7 +19,18 @@ import { TextInput } from "../text-input/text-input";
 
 import styles from "./quick-actions.scss?inline";
 
-const formatActionGroups = (actionGroups: QuickActionsProps['actionGroups']) => {
+interface GroupFromProps {
+  title: string;
+  actions: Omit<Action, 'index'>[];
+}
+
+interface Props {
+  isOpen?: boolean;
+  animationType?: string;
+  actionGroups: GroupFromProps[];
+}
+
+const formatActionGroups = (actionGroups: Props['actionGroups']) => {
   let currentIndex = 0;
 
   return {
@@ -36,7 +47,7 @@ const formatActionGroups = (actionGroups: QuickActionsProps['actionGroups']) => 
   };
 };
 
-export const QuickActions = component$<QuickActionsProps>(
+export const QuickActions = component$<Props>(
   (props) => {
     useStyles$(globalStyles);
     useStyles$(styles);
@@ -45,12 +56,10 @@ export const QuickActions = component$<QuickActionsProps>(
 
     const formattedGroups = useComputed$(() => formatActionGroups(props.actionGroups));
 
-    const focusedGroupIndex = useSignal(0);
-    const focusedActionIndex = useSignal(0);
     const input = useSignal<string>("");
     const searchResults = useSignal<any[]>([]);
 
-    const isOpen = useSignal<boolean>(props.isOpen || true);
+    const isOpen = useSignal<boolean>(props.isOpen || false);
     const animationType = useSignal<string>(props.animationType || "slide");
 
     useOnWindow(
@@ -134,8 +143,6 @@ export const QuickActions = component$<QuickActionsProps>(
       const results = fuse.search(input.value);
 
       searchResults.value = results;
-      focusedGroupIndex.value = 0;
-      focusedActionIndex.value = 0;
     });
 
     return (
