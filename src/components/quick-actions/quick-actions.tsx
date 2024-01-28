@@ -197,27 +197,20 @@ export const QuickActions = component$<QuickActionsProps>(
         return;
       }
 
-      const itemsExpanded = props.actionGroups.flatMap((item) => item.actions.map(action => ({
-        ...action,
-        parentLabel: item.title
-      })));
+      // const itemsExpanded = props.actionGroups.flatMap((item) => item.actions.map(action => ({
+      //   ...action,
+      //   parentLabel: item.title
+      // })));
 
-      const fuse = new Fuse(itemsExpanded, {
+      const fuse = new Fuse(props.actionGroups, {
         keys: [
           "title",
-          "label",
-          "parentLabel"
+          "actions.label"
         ],
         threshold: 0.2
       });
 
       const results = fuse.search(input.value);
-
-      console.log({
-        results,
-        input: input.value,
-        itemsExpanded
-      });
 
       searchResults.value = results;
       focusedGroupIndex.value = 0;
