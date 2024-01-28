@@ -2,15 +2,15 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 6px;
+  padding: 6px 18px 6px 6px;
   gap: 8px;
   border-radius: 12px;
 
   @include transition((background-color));
+
   &-label {
     display: flex;
     flex: 1;
-
     @extend %paragraph-small;
   }
 

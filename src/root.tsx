@@ -1,5 +1,25 @@
+import { $ } from '@builder.io/qwik';
+
+import { InfoIcon } from "./components/icons/info-icon/info-icon";
 import { QuickActions } from "./components/quick-actions/quick-actions";
+
 import "./assets/styles/main.scss";
+
+const DEMO_DATA = [
+  {
+    title: "Demo Actions",
+    actions: [
+      {
+        label: "Console.log",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {
+          console.log("Hello world!");
+        })
+      }
+    ]
+  }
+];
 
 export default () => {
   return (
@@ -9,7 +29,10 @@ export default () => {
         <title>Qwik Quick Actions</title>
       </head>
       <body>
-        <QuickActions />
+        <QuickActions
+          actionGroups={DEMO_DATA}
+          animationType="slide"
+        />
       </body>
     </>
   );

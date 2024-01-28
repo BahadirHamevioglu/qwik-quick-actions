@@ -1,3 +1,4 @@
+/* eslint-disable qwik/valid-lexical-scope */
 import {
   component$,
   useStyles$,
@@ -9,10 +10,7 @@ import Fuse from "fuse.js";
 
 import globalStyles from '@/assets/styles/main.scss?inline';
 
-import { InfoIcon } from "../../components/icons/info-icon/info-icon";
-import {
-  QuickActionsProps, QuickActionsGroupProps
-} from "../../types/types";
+import { QuickActionsProps } from "../../types/types";
 import TransitionIf from "../../utils/transition-if";
 import { ActionListGroup } from "../action-list-group/action-list-group";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
@@ -21,7 +19,7 @@ import { TextInput } from "../text-input/text-input";
 import styles from "./quick-actions.scss?inline";
 
 export const QuickActions = component$<QuickActionsProps>(
-  (props: QuickActionsProps) => {
+  (props) => {
     useStyles$(globalStyles);
     useStyles$(styles);
 
@@ -32,21 +30,6 @@ export const QuickActions = component$<QuickActionsProps>(
 
     const isOpen = useSignal<boolean>(props.isOpen || true);
     const animationType = useSignal<string>(props.animationType || "slide");
-    const actionGroups: QuickActionsGroupProps[] = props.actionGroups || [
-      {
-        title: "Demo Actions",
-        actions: [
-          {
-            label: "Console.log",
-            role: "action",
-            icon: <InfoIcon />,
-            onSelect$: $(() => {
-              console.log("Hello world!");
-            })
-          }
-        ]
-      }
-    ];
 
     // Keydown handler
     useOnWindow(
@@ -83,10 +66,10 @@ export const QuickActions = component$<QuickActionsProps>(
               if (focusedGroupIndex.value > 0) {
                 focusedGroupIndex.value -= 1;
               } else {
-                focusedGroupIndex.value = actionGroups.length - 1;
+                focusedGroupIndex.value = props.actionGroups.length - 1;
               }
               focusedActionIndex.value =
-                actionGroups[focusedGroupIndex.value].actions.length - 1;
+                props.actionGroups[focusedGroupIndex.value].actions.length - 1;
             }
           }
         });
@@ -114,14 +97,14 @@ export const QuickActions = component$<QuickActionsProps>(
           } else {
             // Handle navigation within the full list if no search results
             const currentActions =
-              actionGroups[focusedGroupIndex.value].actions;
+              props.actionGroups[focusedGroupIndex.value].actions;
 
             if (focusedActionIndex.value < currentActions.length - 1) {
               focusedActionIndex.value += 1;
             } else {
               focusedActionIndex.value = 0;
 
-              if (focusedGroupIndex.value < actionGroups.length - 1) {
+              if (focusedGroupIndex.value < props.actionGroups.length - 1) {
                 focusedGroupIndex.value += 1;
               } else {
                 focusedGroupIndex.value = 0;
@@ -146,7 +129,7 @@ export const QuickActions = component$<QuickActionsProps>(
             }
           } else {
             // If there are no search results, trigger the action from the full list
-            const group = actionGroups[focusedGroupIndex.value];
+            const group = props.actionGroups[focusedGroupIndex.value];
 
             if (group && group.actions.length > focusedActionIndex.value) {
               action = group.actions[focusedActionIndex.value];
@@ -209,7 +192,7 @@ export const QuickActions = component$<QuickActionsProps>(
       input.value = event.target.value;
 
       // Move the Fuse instance creation inside the lexical scope
-      const fuse = new Fuse(actionGroups, {
+      const fuse = new Fuse(props.actionGroups, {
         keys: [
           "title",
           "actions.label"
@@ -249,7 +232,7 @@ export const QuickActions = component$<QuickActionsProps>(
           {/* No results, and no input */}
           {searchResults.value.length === 0 && input.value.length === 0 && (
             <>
-              {actionGroups.map((group: any, index: any) => (
+              {props.actionGroups.map((group: any, index: any) => (
                 <ActionListGroup
                   items={group.actions.map((action: any) => ({
                     ...action,

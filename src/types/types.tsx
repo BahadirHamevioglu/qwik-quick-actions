@@ -1,10 +1,12 @@
-import { QRL } from "@builder.io/qwik";
+import {
+  Component, QRL
+} from "@builder.io/qwik";
 
 // quick-actions.tsx
 export interface QuickActionsProps {
   isOpen?: boolean;
   animationType?: string;
-  actionGroups?: QuickActionsGroupProps[];
+  actionGroups: QuickActionsGroupProps[];
 }
 
 export interface QuickActionsGroupProps {
@@ -15,7 +17,7 @@ export interface QuickActionsGroupProps {
 interface QuickActionsActionProps {
   label: string;
   role: string;
-  icon: any;
+  icon: Component<object>;
   onSelect$?: QRL<() => void>;
 }
 
@@ -27,7 +29,7 @@ export interface ActionListGroupProps {
 interface ActionListGroupItemProps {
   label: string;
   role: string;
-  icon: any;
+  icon: QRL<() => void>;
   onSelect$: QRL<() => void>;
   focusedItemIndex: number;
 }
