@@ -9,7 +9,7 @@ interface ActionListGroupItemProps {
   shortcut?: string;
   href?: string;
 
-  onSelect$?: () => void;
+  onSelect$: () => void;
   role?: string;
 
   isFocused?: boolean;

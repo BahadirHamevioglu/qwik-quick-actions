@@ -11,7 +11,6 @@ interface ActionListGroupResultProps {
 
 interface ActionListGroupResultItemProps {
   label: string;
-  href: string;
   role: string;
   icon: string;
   onSelect$: () => void;

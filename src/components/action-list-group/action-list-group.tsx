@@ -1,39 +1,39 @@
 import { component$, useStylesScoped$ } from "@builder.io/qwik";
+import styles from "./action-list-group.scss?inline";
+
 import { ActionListGroupTitle } from "../action-list-group-title/action-list-group-title";
 import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
 
-import styles from "./action-list-group.scss?inline";
 interface ActionListGroupProps {
-  title?: string;
+  title: string;
+  items: ActionListGroupItemProps[];
+}
 
-  actions: Array<{
-    label: string;
-    role?: string;
-    icon?: any;
-    onSelect$?: () => void;
-    focusedItemIndex?: number;
-  }>;
+interface ActionListGroupItemProps {
+  label: string;
+  role: string;
+  icon: string;
+  onSelect$: () => void;
+  focusedItemIndex: number;
 }
 
 export const ActionListGroup = component$<ActionListGroupProps>(
   (props: ActionListGroupProps) => {
+    const { title, items } = props;
     useStylesScoped$(styles);
     return (
       <div class="action-list-group">
-        <ActionListGroupTitle title={props.title} />
-        {props.actions.map((action: any, index: number) => {
-          const key = `${action.label}-${index}`;
-          return (
-            <ActionListGroupItem
-              key={key}
-              label={action.label}
-              role={action.role}
-              icon={action.icon && action.icon}
-              isFocused={action.focusedItemIndex === index}
-              onSelect$={action.onSelect$}
-            />
-          );
-        })}
+        <ActionListGroupTitle title={title} />
+        {items.map((item, index) => (
+          <ActionListGroupItem
+            key={item.label + index}
+            label={item.label}
+            role={item.role}
+            icon={item.icon}
+            isFocused={item.focusedItemIndex === index}
+            onSelect$={item.onSelect$}
+          />
+        ))}
       </div>
     );
   }

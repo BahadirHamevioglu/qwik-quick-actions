@@ -11,9 +11,8 @@ import Fuse from "fuse.js";
 import { InfoIcon } from "../icons/info-icon/info-icon";
 
 import { TextInput } from "../text-input/text-input";
-import { ActionList } from "../action-list/action-list";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
-import { ActionListGroupResult } from "../action-list-group-result/action-list-group-result";
+import { ActionListGroup } from "../action-list-group/action-list-group";
 
 import TransitionIf from "../../utils/transition-if";
 
@@ -26,13 +25,16 @@ const actionGroups = [
         role: "link",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
         onSelect$: $(() => {
-          console.log("Search for action...");
+          console.log("1. array 1. item");
         }),
       },
       {
         label: "Sign up",
         role: "link",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
+        onSelect$: $(() => {
+          console.log("1. array 2. item");
+        }),
       },
     ],
   },
@@ -42,11 +44,32 @@ const actionGroups = [
     actions: [
       {
         label: "Console.log",
-        as: "button",
         role: "command",
         icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
         onSelect$: $(() => {
-          console.log("Search for action...");
+          console.log("2. array 1. item");
+        }),
+      },
+    ],
+  },
+
+  {
+    title: "Pages",
+    actions: [
+      {
+        label: "Home",
+        role: "page",
+        icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
+        onSelect$: $(() => {
+          console.log("3. array 1. item");
+        }),
+      },
+      {
+        label: "Settings",
+        role: "page",
+        icon: <InfoIcon width={20} height={20} color="var(--icon-400)" />,
+        onSelect$: $(() => {
+          console.log("3. array 2. item");
         }),
       },
     ],
@@ -57,13 +80,17 @@ const actionGroups = [
 const fuse = new Fuse(actionGroups, {
   keys: ["title", "actions.label"],
   includeMatches: true,
+  threshold: 0.3,
+  useExtendedSearch: true,
 });
 
 export const QuickActions = component$(() => {
   useStyles$(styles);
 
   const isOpen = useSignal<boolean>(true);
-  const focusedIndex = useSignal<number>(0);
+
+  const focusedGroupIndex = useSignal<number>(0);
+  const focusedActionIndex = useSignal<number>(0);
   const input = useSignal<string>("");
   const searchResults = useSignal<any[]>([]);
   const animationType = useSignal<string>("slide");
@@ -77,28 +104,124 @@ export const QuickActions = component$(() => {
         isOpen.value = !isOpen.value;
       }
 
+      const handleArrowUp = $(() => {
+        if (!isOpen.value) return;
+        if (searchResults.value.length === 0 && input.value.length > 0) return;
+
+        if (searchResults.value.length > 0) {
+          if (focusedActionIndex.value > 0) {
+            focusedActionIndex.value -= 1;
+          } else {
+            if (focusedGroupIndex.value > 0) {
+              focusedGroupIndex.value -= 1;
+            } else {
+              focusedGroupIndex.value = searchResults.value.length - 1;
+            }
+            focusedActionIndex.value =
+              searchResults.value[focusedGroupIndex.value].item.actions.length -
+              1;
+          }
+        } else {
+          // Handle navigation within the full list if no search results
+          if (focusedActionIndex.value > 0) {
+            focusedActionIndex.value -= 1;
+          } else {
+            if (focusedGroupIndex.value > 0) {
+              focusedGroupIndex.value -= 1;
+            } else {
+              focusedGroupIndex.value = actionGroups.length - 1;
+            }
+            focusedActionIndex.value =
+              actionGroups[focusedGroupIndex.value].actions.length - 1;
+          }
+        }
+      });
+
+      const handleArrowDown = $(() => {
+        if (!isOpen.value) return;
+        if (searchResults.value.length === 0 && input.value.length > 0) return;
+
+        if (searchResults.value.length > 0 && input.value.length > 0) {
+          const currentActions =
+            searchResults.value[focusedGroupIndex.value].item.actions;
+          if (focusedActionIndex.value < currentActions.length - 1) {
+            focusedActionIndex.value += 1;
+          } else {
+            focusedActionIndex.value = 0;
+            if (focusedGroupIndex.value < searchResults.value.length - 1) {
+              focusedGroupIndex.value += 1;
+            } else {
+              focusedGroupIndex.value = 0;
+            }
+          }
+        } else {
+          // Handle navigation within the full list if no search results
+          const currentActions = actionGroups[focusedGroupIndex.value].actions;
+          if (focusedActionIndex.value < currentActions.length - 1) {
+            focusedActionIndex.value += 1;
+          } else {
+            focusedActionIndex.value = 0;
+            if (focusedGroupIndex.value < actionGroups.length - 1) {
+              focusedGroupIndex.value += 1;
+            } else {
+              focusedGroupIndex.value = 0;
+            }
+          }
+        }
+      });
+
+      const handleEnter = $((event?: any) => {
+        if (!isOpen.value) return;
+        if (searchResults.value.length === 0 && input.value.length > 0) return;
+
+        let action;
+        if (searchResults.value.length > 0) {
+          // If we have search results, trigger the action from the search results
+          const group = searchResults.value[focusedGroupIndex.value];
+          if (group && group.item.actions.length > focusedActionIndex.value) {
+            action = group.item.actions[focusedActionIndex.value];
+          }
+        } else {
+          // If there are no search results, trigger the action from the full list
+          const group = actionGroups[focusedGroupIndex.value];
+          if (group && group.actions.length > focusedActionIndex.value) {
+            action = group.actions[focusedActionIndex.value];
+          }
+        }
+
+        // Trigger the onSelect$ event if it exists
+        action?.onSelect$?.();
+
+        if (event) {
+          event!.preventDefault(); // Prevent default to avoid triggering the action twice
+        }
+      });
+
       if (event.code === "Escape") {
         if (input.value.length > 0 && isOpen.value) {
           event.preventDefault();
           input.value = "";
-        } else if (isOpen.value) {
+        } else if (isOpen.value && input.value.length === 0) {
           event.preventDefault();
           // Close the quick actions if open
           isOpen.value = false;
         }
       }
 
-      if (event.code === "ArrowUp") {
-        event.preventDefault();
-        // Handle ArrowUp event if needed
-        isOpen.value = false;
-        console.log("ArrowUp");
-      }
-
-      if (event.code === "ArrowDown") {
-        event.preventDefault();
-        isOpen.value = true;
-        // Handle ArrowDown event if needed
+      switch (event.code) {
+        case "ArrowUp":
+          event.preventDefault();
+          handleArrowUp();
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          handleArrowDown();
+          break;
+        case "Enter":
+          handleEnter();
+          break;
+        default:
+          break;
       }
     })
   );
@@ -121,6 +244,9 @@ export const QuickActions = component$(() => {
     input.value = event.target.value;
     const results = input.value ? fuse.search(input.value) : [];
     searchResults.value = results;
+    // Reset focused values when searchResults are updated
+    focusedGroupIndex.value = 0;
+    focusedActionIndex.value = 0;
   });
 
   return (
@@ -142,7 +268,21 @@ export const QuickActions = component$(() => {
       <div class="quick-actions-content">
         {/* No results, and no input */}
         {searchResults.value.length === 0 && input.value.length === 0 && (
-          <ActionList actionGroups={actionGroups} />
+          <>
+            {actionGroups.map((group, index) => (
+              <ActionListGroup
+                key={group.title}
+                title={group.title}
+                items={group.actions.map((action: any) => ({
+                  ...action,
+                  focusedItemIndex:
+                    focusedGroupIndex.value === index
+                      ? focusedActionIndex.value
+                      : undefined,
+                }))}
+              />
+            ))}
+          </>
         )}
         {/* No results, and input */}
         {searchResults.value.length === 0 && input.value.length > 0 && (
@@ -150,20 +290,23 @@ export const QuickActions = component$(() => {
         )}
         {/* Results */}
         {searchResults.value.length > 0 && (
-          <div class="action-list">
+          <>
             {searchResults.value.map((result, index) => {
               return (
-                <ActionListGroupResult
+                <ActionListGroup
                   key={result.item.title}
                   title={result.item.title}
                   items={result.item.actions.map((action: any) => ({
                     ...action,
-                    focusedItemIndex: focusedIndex.value === index ? index : -1,
+                    focusedItemIndex:
+                      focusedGroupIndex.value === index
+                        ? focusedActionIndex.value
+                        : undefined,
                   }))}
                 />
               );
             })}
-          </div>
+          </>
         )}
       </div>
     </TransitionIf>
