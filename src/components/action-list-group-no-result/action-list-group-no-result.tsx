@@ -1,6 +1,9 @@
-import { component$, useStylesScoped$ } from "@builder.io/qwik";
+import {
+  component$, useStylesScoped$
+} from "@builder.io/qwik";
 
 import emptyImage from "../../assets/images/empty.png";
+
 import styles from "./action-list-group-no-result.scss?inline";
 
 export const ActionListGroupNoResult = component$(() => {
@@ -9,7 +12,12 @@ export const ActionListGroupNoResult = component$(() => {
   return (
     <div class="action-list-group-no-result">
       <div class="action-list-group-no-result-image">
-        <img src={emptyImage} alt="No results" width={108} height={108} />
+        <img
+          alt="No results"
+          height={108}
+          src={emptyImage}
+          width={108}
+        />
       </div>
       <div class="action-list-group-no-result-labels">
         <p class="action-list-group-no-result-labels-label">

@@ -4,7 +4,8 @@ import {
   useStyles$,
   $,
   useOnWindow,
-  useSignal
+  useSignal,
+  useComputed$
 } from "@builder.io/qwik";
 import Fuse from "fuse.js";
 
@@ -18,20 +19,40 @@ import { TextInput } from "../text-input/text-input";
 
 import styles from "./quick-actions.scss?inline";
 
+const formatActionGroups = (actionGroups: QuickActionsProps['actionGroups']) => {
+  let currentIndex = 0;
+
+  return {
+    items: actionGroups.map((group) => {
+      return {
+        ...group,
+        actions: group.actions.map((action) => ({
+          ...action,
+          index: currentIndex++
+        }))
+      };
+    }),
+    maxIndex: currentIndex
+  };
+};
+
 export const QuickActions = component$<QuickActionsProps>(
   (props) => {
     useStyles$(globalStyles);
     useStyles$(styles);
 
-    const focusedGroupIndex = useSignal<number>(0);
-    const focusedActionIndex = useSignal<number>(0);
+    const focusedIndex = useSignal(2);
+
+    const formattedGroups = useComputed$(() => formatActionGroups(props.actionGroups));
+
+    const focusedGroupIndex = useSignal(0);
+    const focusedActionIndex = useSignal(0);
     const input = useSignal<string>("");
     const searchResults = useSignal<any[]>([]);
 
     const isOpen = useSignal<boolean>(props.isOpen || true);
     const animationType = useSignal<string>(props.animationType || "slide");
 
-    // Keydown handler
     useOnWindow(
       "keydown",
       $((event) => {
@@ -40,149 +61,49 @@ export const QuickActions = component$<QuickActionsProps>(
           isOpen.value = !isOpen.value;
         }
 
-        const handleArrowUp = $(() => {
-          if (!isOpen.value) return;
-          if (searchResults.value.length === 0 && input.value.length > 0)
-            return;
-
-          if (searchResults.value.length > 0) {
-            if (focusedActionIndex.value > 0) {
-              focusedActionIndex.value -= 1;
-            } else {
-              if (focusedGroupIndex.value > 0) {
-                focusedGroupIndex.value -= 1;
-              } else {
-                focusedGroupIndex.value = searchResults.value.length - 1;
-              }
-              focusedActionIndex.value =
-                searchResults.value[focusedGroupIndex.value].item.actions
-                  .length - 1;
-            }
-          } else {
-            // Handle navigation within the full list if no search results
-            if (focusedActionIndex.value > 0) {
-              focusedActionIndex.value -= 1;
-            } else {
-              if (focusedGroupIndex.value > 0) {
-                focusedGroupIndex.value -= 1;
-              } else {
-                focusedGroupIndex.value = props.actionGroups.length - 1;
-              }
-              focusedActionIndex.value =
-                props.actionGroups[focusedGroupIndex.value].actions.length - 1;
-            }
-          }
-        });
-
-        const handleArrowDown = $(() => {
-          if (!isOpen.value) return;
-          if (searchResults.value.length === 0 && input.value.length > 0)
-            return;
-
-          if (searchResults.value.length > 0 && input.value.length > 0) {
-            const currentActions =
-              searchResults.value[focusedGroupIndex.value].item.actions;
-
-            if (focusedActionIndex.value < currentActions.length - 1) {
-              focusedActionIndex.value += 1;
-            } else {
-              focusedActionIndex.value = 0;
-
-              if (focusedGroupIndex.value < searchResults.value.length - 1) {
-                focusedGroupIndex.value += 1;
-              } else {
-                focusedGroupIndex.value = 0;
-              }
-            }
-          } else {
-            // Handle navigation within the full list if no search results
-            const currentActions =
-              props.actionGroups[focusedGroupIndex.value].actions;
-
-            if (focusedActionIndex.value < currentActions.length - 1) {
-              focusedActionIndex.value += 1;
-            } else {
-              focusedActionIndex.value = 0;
-
-              if (focusedGroupIndex.value < props.actionGroups.length - 1) {
-                focusedGroupIndex.value += 1;
-              } else {
-                focusedGroupIndex.value = 0;
-              }
-            }
-          }
-        });
-
-        const handleEnter = $((event?: any) => {
-          if (!isOpen.value) return;
-          if (searchResults.value.length === 0 && input.value.length > 0)
-            return;
-
-          let action;
-
-          if (searchResults.value.length > 0) {
-            // If we have search results, trigger the action from the search results
-            const group = searchResults.value[focusedGroupIndex.value];
-
-            if (group && group.item.actions.length > focusedActionIndex.value) {
-              action = group.item.actions[focusedActionIndex.value];
-            }
-          } else {
-            // If there are no search results, trigger the action from the full list
-            const group = props.actionGroups[focusedGroupIndex.value];
-
-            if (group && group.actions.length > focusedActionIndex.value) {
-              action = group.actions[focusedActionIndex.value];
-            }
-          }
-
-          // Trigger the onSelect$ event if it exists
-          action?.onSelect$?.();
-
-          if (event) {
-            event!.preventDefault(); // Prevent default to avoid triggering the action twice
-          }
-        });
+        if (!isOpen.value) return;
 
         if (event.code === "Escape") {
-          if (input.value.length > 0 && isOpen.value) {
-            event.preventDefault();
+          event.preventDefault();
+
+          if (input.value.length > 0) {
             input.value = "";
-          } else if (isOpen.value && input.value.length === 0) {
-            event.preventDefault();
-            // Close the quick actions if open
+          } else {
             isOpen.value = false;
           }
         }
 
-        switch (event.code) {
-          case "ArrowUp":
-            event.preventDefault();
-            handleArrowUp();
-            break;
-          case "ArrowDown":
-            event.preventDefault();
-            handleArrowDown();
-            break;
-          case "Enter":
-            handleEnter();
-            break;
-          default:
-            break;
+        if (event.code === 'ArrowDown') {
+          focusedIndex.value = Math.min(focusedIndex.value + 1, formattedGroups.value.maxIndex - 1);
+        }
+
+        if (event.code === 'ArrowUp') {
+          focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
+        }
+
+        if ([
+          'ArrowDown',
+          'ArrowUp'
+        ].includes(event.code)) {
+          setTimeout(() => {
+            const item = document.querySelector(`[data-index="${focusedIndex.value}"]`);
+
+            item?.scrollIntoView({
+              block: 'nearest',
+              inline: 'center'
+            });
+          });
         }
       })
     );
 
-    // Click handler
     useOnWindow(
       "click",
       $((event) => {
         const target = event.target as HTMLElement;
 
-        if (!target.closest(".quick-actions")) {
-          if (isOpen.value) {
-            isOpen.value = false;
-          }
+        if (!target.closest(".quick-actions") && isOpen.value) {
+          isOpen.value = false;
         }
       })
     );
@@ -237,17 +158,11 @@ export const QuickActions = component$<QuickActionsProps>(
           {/* No results, and no input */}
           {searchResults.value.length === 0 && input.value.length === 0 && (
             <>
-              {props.actionGroups.map((group: any, index: any) => (
+              {formattedGroups.value.items.map((group, index) => (
                 <ActionListGroup
-                  items={group.actions.map((action: any) => ({
-                    ...action,
-                    focusedItemIndex:
-                      focusedGroupIndex.value === index
-                        ? focusedActionIndex.value
-                        : undefined
-                  }))}
+                  {...group}
+                  focusedIndex={focusedIndex.value}
                   key={group.title + index}
-                  title={group.title}
                 />
               ))}
             </>
@@ -257,7 +172,7 @@ export const QuickActions = component$<QuickActionsProps>(
             <ActionListGroupNoResult />
           )}
 
-          {searchResults.value.map((result, index) => {
+          {/* {searchResults.value.map((result, index) => {
             return (
               <ActionListGroup
                 items={result.item.actions.map((action: any) => ({
@@ -271,7 +186,7 @@ export const QuickActions = component$<QuickActionsProps>(
                 title={result.item.title}
               />
             );
-          })}
+          })} */}
         </div>
       </TransitionIf>
     );

@@ -6,58 +6,25 @@ import {
 export interface QuickActionsProps {
   isOpen?: boolean;
   animationType?: string;
-  actionGroups: QuickActionsGroupProps[];
+  actionGroups: GroupFromProps[];
 }
 
-export interface QuickActionsGroupProps {
+export interface GroupFromProps {
   title: string;
-  actions: QuickActionsActionProps[];
+  actions: Omit<Action, 'index'>[];
 }
 
-interface QuickActionsActionProps {
+export interface Group {
+  title: string;
+  actions: Action[];
+}
+
+export interface Action {
   label: string;
   role: string;
   icon: Component<object>;
   onSelect$?: QRL<() => void>;
-}
-
-export interface ActionListGroupProps {
-  title: string;
-  items: ActionListGroupItemProps[];
-}
-
-interface ActionListGroupItemProps {
-  label: string;
-  role: string;
-  icon: QRL<() => void>;
-  onSelect$: QRL<() => void>;
-  focusedItemIndex: number;
-}
-
-export interface ActionListGroupItemForComponentProps {
-  icon: any;
-  label: string;
-  shortcut?: string;
-  href?: string;
-
-  onSelect$: QRL<() => void>;
-  role?: string;
-
-  isFocused?: boolean;
-}
-
-// action-list-group-result.tsx
-export interface ActionListGroupResultProps {
-  title: string;
-  items: ActionListGroupResultItemProps[];
-}
-
-interface ActionListGroupResultItemProps {
-  label: string;
-  role: string;
-  icon: any;
-  onSelect$: QRL<() => void>;
-  focusedItemIndex: number;
+  index: number;
 }
 
 // key-icon.tsx
