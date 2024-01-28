@@ -1,22 +1,12 @@
 import { component$, useStylesScoped$ } from "@builder.io/qwik";
 import { KeyIcon } from "../key-icon/key-icon";
 
+import { ActionListGroupItemForComponentProps } from "../../types/types";
+
 import styles from "./action-list-group-item.scss?inline";
 
-interface ActionListGroupItemProps {
-  icon?: any;
-  label: string;
-  shortcut?: string;
-  href?: string;
-
-  onSelect$: () => void;
-  role?: string;
-
-  isFocused?: boolean;
-}
-
 export const ActionListGroupItem = component$(
-  (props: ActionListGroupItemProps) => {
+  (props: ActionListGroupItemForComponentProps) => {
     const { isFocused } = props;
     useStylesScoped$(styles);
 

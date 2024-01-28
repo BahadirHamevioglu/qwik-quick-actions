@@ -1,21 +1,11 @@
 import { component$, useStylesScoped$ } from "@builder.io/qwik";
+
+import { ActionListGroupResultProps } from "../../types/types";
+
 import styles from "./action-list-group-result.scss?inline";
 
 import { ActionListGroupTitle } from "../action-list-group-title/action-list-group-title";
 import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
-
-interface ActionListGroupResultProps {
-  title: string;
-  items: ActionListGroupResultItemProps[];
-}
-
-interface ActionListGroupResultItemProps {
-  label: string;
-  role: string;
-  icon: string;
-  onSelect$: () => void;
-  focusedItemIndex: number;
-}
 
 export const ActionListGroupResult = component$<ActionListGroupResultProps>(
   (props: ActionListGroupResultProps) => {

@@ -52,7 +52,6 @@ export default component$<Props>((props) => {
       {render.value && (
         <div
           class={[
-            "relative",
             props.class,
             {
               [props.enter + " "]: animationState.value === "enter",
