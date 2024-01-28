@@ -211,15 +211,12 @@ export const QuickActions = component$<QuickActionsProps>(
 
     return (
       <TransitionIf
-        class="quick-actions"
-        enter={
-          "quick-actions-animations-enter" +
-          (animationType.value ? "-" + animationType.value : "")
-        }
-        exit={
-          "quick-actions-animations-exit" +
-          (animationType.value ? "-" + animationType.value : "")
-        }
+        class={[
+          "quick-actions",
+          animationType.value ? `quick-actions-animation-${animationType.value}` : ''
+        ]}
+        enter="quick-actions-animation-enter"
+        exit="quick-actions-animation-exit"
         if={isOpen.value}
       >
         <div class="quick-actions-head">

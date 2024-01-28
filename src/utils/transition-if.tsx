@@ -4,13 +4,13 @@ import {
   component$,
   useComputed$,
   useSignal,
-  useTask$,
+  useTask$
 } from "@builder.io/qwik";
 
 interface Props {
   enter: string;
   exit: string;
-  class?: string;
+  class?: any;
   if: boolean;
 }
 
@@ -55,8 +55,8 @@ export default component$<Props>((props) => {
             props.class,
             {
               [props.enter + " "]: animationState.value === "enter",
-              [props.exit]: animationState.value.startsWith("exit"),
-            },
+              [props.exit]: animationState.value.startsWith("exit")
+            }
           ]}
           ref={wrapperRef}
           onTransitionEnd$={() => {

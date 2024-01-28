@@ -16,6 +16,22 @@ const DEMO_DATA = [
         onSelect$: $(() => {
           console.log("Hello world!");
         })
+      },
+      {
+        label: "Console.log2",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {
+          console.log("Hello world!");
+        })
+      },
+      {
+        label: "Console.log3",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {
+          console.log("Hello world!");
+        })
       }
     ]
   }
