@@ -7,31 +7,72 @@ import "./assets/styles/main.scss";
 
 const DEMO_DATA = [
   {
-    title: "Demo Actions",
+    title: "User Management",
     actions: [
       {
-        label: "Console.log",
+        label: "Add User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {
-          console.log("Hello world!");
-        })
+        onSelect$: $(() => { })
       },
       {
-        label: "Console.log2",
+        label: "Edit User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {
-          console.log("Hello world!");
-        })
+        onSelect$: $(() => {})
       },
       {
-        label: "Console.log3",
+        label: "Delete User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {
-          console.log("Hello world!");
-        })
+        onSelect$: $(() => {})
+      },
+      {
+        label: "Activate User",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      },
+      {
+        label: "Deactivate User",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      }
+    ]
+  },
+  {
+    title: "System Settings",
+    actions: [
+      {
+        label: "Change Theme",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      },
+      {
+        label: "Update Profile",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      },
+      {
+        label: "Change Password",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      },
+      {
+        label: "Configure Notifications",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
+      },
+      {
+        label: "System Backup",
+        role: "action",
+        icon: InfoIcon,
+        onSelect$: $(() => {})
       }
     ]
   }

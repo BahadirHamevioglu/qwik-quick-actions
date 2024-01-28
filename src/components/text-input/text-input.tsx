@@ -1,10 +1,14 @@
-import { component$, useStylesScoped$ } from "@builder.io/qwik";
+import {
+  component$, useStylesScoped$
+} from "@builder.io/qwik";
+
 import { SearchIcon } from "../icons/search-icon/search-icon";
+
 import styles from "./text-input.scss?inline";
 
 interface TextInputProps {
   value?: string;
-  onInput$?: (e: Event) => void; // Event handler
+  onInput$?: (e: InputEvent) => void; // Event handler
 }
 
 export const TextInput = component$<TextInputProps>((props: TextInputProps) => {
@@ -13,14 +17,18 @@ export const TextInput = component$<TextInputProps>((props: TextInputProps) => {
   return (
     <label class="text-input-wrapper">
       <div class="text-input-left-icon">
-        <SearchIcon width={20} height={20} color="var(--icon-400)" />
+        <SearchIcon
+          color="var(--icon-400)"
+          height={20}
+          width={20}
+        />
       </div>
       <input
         class="text-input-text-area"
-        type="text"
         placeholder="Search for action..."
-        autoFocus
+        type="text"
         value={props.value} // Directly bind props value
+        autoFocus
         {...(props.onInput$ && { onInput$: props.onInput$ })} // Conditionally spread the onInput$ handler
       />
     </label>

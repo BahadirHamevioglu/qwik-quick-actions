@@ -187,24 +187,39 @@ export const QuickActions = component$<QuickActionsProps>(
       })
     );
 
-    // onInput handler
-    const onInput$ = $((event: any) => {
-      input.value = event.target.value;
+    const onInput$ = $((event: InputEvent) => {
+      const target = event.target as HTMLInputElement;
+      input.value = target.value;
 
-      // Move the Fuse instance creation inside the lexical scope
-      const fuse = new Fuse(props.actionGroups, {
+      if (input.value.length === 0) {
+        searchResults.value = [];
+
+        return;
+      }
+
+      const itemsExpanded = props.actionGroups.flatMap((item) => item.actions.map(action => ({
+        ...action,
+        parentLabel: item.title
+      })));
+
+      const fuse = new Fuse(itemsExpanded, {
         keys: [
           "title",
-          "actions.label"
+          "label",
+          "parentLabel"
         ],
-        includeMatches: true,
-        threshold: 0.3,
-        useExtendedSearch: true
+        threshold: 0.2
       });
 
-      const results = input.value ? fuse.search(input.value) : [];
+      const results = fuse.search(input.value);
+
+      console.log({
+        results,
+        input: input.value,
+        itemsExpanded
+      });
+
       searchResults.value = results;
-      // Reset focused values when searchResults are updated
       focusedGroupIndex.value = 0;
       focusedActionIndex.value = 0;
     });
@@ -244,30 +259,26 @@ export const QuickActions = component$<QuickActionsProps>(
               ))}
             </>
           )}
-          {/* No results, and input */}
+
           {searchResults.value.length === 0 && input.value.length > 0 && (
             <ActionListGroupNoResult />
           )}
-          {/* Results */}
-          {searchResults.value.length > 0 && (
-            <>
-              {searchResults.value.map((result, index) => {
-                return (
-                  <ActionListGroup
-                    items={result.item.actions.map((action: any) => ({
-                      ...action,
-                      focusedItemIndex:
+
+          {searchResults.value.map((result, index) => {
+            return (
+              <ActionListGroup
+                items={result.item.actions.map((action: any) => ({
+                  ...action,
+                  focusedItemIndex:
                         focusedGroupIndex.value === index
                           ? focusedActionIndex.value
                           : undefined
-                    }))}
-                    key={result.item.title}
-                    title={result.item.title}
-                  />
-                );
-              })}
-            </>
-          )}
+                }))}
+                key={result.item.title}
+                title={result.item.title}
+              />
+            );
+          })}
         </div>
       </TransitionIf>
     );
