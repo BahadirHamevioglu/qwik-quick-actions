@@ -3,23 +3,26 @@ import {
   useStyles$,
   $,
   useOnWindow,
-  useSignal,
+  useSignal
 } from "@builder.io/qwik";
-import styles from "./quick-actions.scss?inline";
 import Fuse from "fuse.js";
 
-import { TextInput } from "../text-input/text-input";
-import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
-import { ActionListGroup } from "../action-list-group/action-list-group";
-
-import { QuickActionsProps, QuickActionsGroupProps } from "../../types/types";
+import globalStyles from '@/assets/styles/main.scss?inline';
 
 import { InfoIcon } from "../../components/icons/info-icon/info-icon";
-
+import {
+  QuickActionsProps, QuickActionsGroupProps
+} from "../../types/types";
 import TransitionIf from "../../utils/transition-if";
+import { ActionListGroup } from "../action-list-group/action-list-group";
+import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
+import { TextInput } from "../text-input/text-input";
+
+import styles from "./quick-actions.scss?inline";
 
 export const QuickActions = component$<QuickActionsProps>(
   (props: QuickActionsProps) => {
+    useStyles$(globalStyles);
     useStyles$(styles);
 
     const focusedGroupIndex = useSignal<number>(0);
@@ -39,10 +42,10 @@ export const QuickActions = component$<QuickActionsProps>(
             icon: <InfoIcon />,
             onSelect$: $(() => {
               console.log("Hello world!");
-            }),
-          },
-        ],
-      },
+            })
+          }
+        ]
+      }
     ];
 
     // Keydown handler
@@ -96,10 +99,12 @@ export const QuickActions = component$<QuickActionsProps>(
           if (searchResults.value.length > 0 && input.value.length > 0) {
             const currentActions =
               searchResults.value[focusedGroupIndex.value].item.actions;
+
             if (focusedActionIndex.value < currentActions.length - 1) {
               focusedActionIndex.value += 1;
             } else {
               focusedActionIndex.value = 0;
+
               if (focusedGroupIndex.value < searchResults.value.length - 1) {
                 focusedGroupIndex.value += 1;
               } else {
@@ -110,10 +115,12 @@ export const QuickActions = component$<QuickActionsProps>(
             // Handle navigation within the full list if no search results
             const currentActions =
               actionGroups[focusedGroupIndex.value].actions;
+
             if (focusedActionIndex.value < currentActions.length - 1) {
               focusedActionIndex.value += 1;
             } else {
               focusedActionIndex.value = 0;
+
               if (focusedGroupIndex.value < actionGroups.length - 1) {
                 focusedGroupIndex.value += 1;
               } else {
@@ -129,15 +136,18 @@ export const QuickActions = component$<QuickActionsProps>(
             return;
 
           let action;
+
           if (searchResults.value.length > 0) {
             // If we have search results, trigger the action from the search results
             const group = searchResults.value[focusedGroupIndex.value];
+
             if (group && group.item.actions.length > focusedActionIndex.value) {
               action = group.item.actions[focusedActionIndex.value];
             }
           } else {
             // If there are no search results, trigger the action from the full list
             const group = actionGroups[focusedGroupIndex.value];
+
             if (group && group.actions.length > focusedActionIndex.value) {
               action = group.actions[focusedActionIndex.value];
             }
@@ -185,6 +195,7 @@ export const QuickActions = component$<QuickActionsProps>(
       "click",
       $((event) => {
         const target = event.target as HTMLElement;
+
         if (!target.closest(".quick-actions")) {
           if (isOpen.value) {
             isOpen.value = false;
@@ -199,10 +210,13 @@ export const QuickActions = component$<QuickActionsProps>(
 
       // Move the Fuse instance creation inside the lexical scope
       const fuse = new Fuse(actionGroups, {
-        keys: ["title", "actions.label"],
+        keys: [
+          "title",
+          "actions.label"
+        ],
         includeMatches: true,
         threshold: 0.3,
-        useExtendedSearch: true,
+        useExtendedSearch: true
       });
 
       const results = input.value ? fuse.search(input.value) : [];
@@ -214,7 +228,6 @@ export const QuickActions = component$<QuickActionsProps>(
 
     return (
       <TransitionIf
-        if={isOpen.value}
         class="quick-actions"
         enter={
           "quick-actions-animations-enter" +
@@ -224,9 +237,13 @@ export const QuickActions = component$<QuickActionsProps>(
           "quick-actions-animations-exit" +
           (animationType.value ? "-" + animationType.value : "")
         }
+        if={isOpen.value}
       >
         <div class="quick-actions-head">
-          <TextInput value={input.value} onInput$={onInput$} />
+          <TextInput
+            value={input.value}
+            onInput$={onInput$}
+          />
         </div>
         <div class="quick-actions-content">
           {/* No results, and no input */}
@@ -234,15 +251,15 @@ export const QuickActions = component$<QuickActionsProps>(
             <>
               {actionGroups.map((group: any, index: any) => (
                 <ActionListGroup
-                  key={group.title + index}
-                  title={group.title}
                   items={group.actions.map((action: any) => ({
                     ...action,
                     focusedItemIndex:
                       focusedGroupIndex.value === index
                         ? focusedActionIndex.value
-                        : undefined,
+                        : undefined
                   }))}
+                  key={group.title + index}
+                  title={group.title}
                 />
               ))}
             </>
@@ -257,15 +274,15 @@ export const QuickActions = component$<QuickActionsProps>(
               {searchResults.value.map((result, index) => {
                 return (
                   <ActionListGroup
-                    key={result.item.title}
-                    title={result.item.title}
                     items={result.item.actions.map((action: any) => ({
                       ...action,
                       focusedItemIndex:
                         focusedGroupIndex.value === index
                           ? focusedActionIndex.value
-                          : undefined,
+                          : undefined
                     }))}
+                    key={result.item.title}
+                    title={result.item.title}
                   />
                 );
               })}

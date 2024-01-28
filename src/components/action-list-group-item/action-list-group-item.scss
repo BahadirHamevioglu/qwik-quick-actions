@@ -1,14 +1,9 @@
-@import "../../assets/styles/presets/typography.scss";
-@import "../../assets/styles/mixins/transitions.scss";
-
 .action-list-group-item {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   padding: 6px;
   gap: 8px;
-
   border-radius: 12px;
 
   @include transition((background-color));

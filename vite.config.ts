@@ -26,5 +26,25 @@ export default defineConfig(() => {
       },
     },
     plugins: [qwikVite(), tsconfigPaths()],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData(source: string, filePath: string) {
+            if (filePath.includes("styles/presets") || filePath.includes("styles/mixins")) return source;
+
+            // Use additionalData from legacy nuxt scss options
+            return (
+              `
+            @use 'sass:math';
+            @use 'sass:list';
+            @use 'sass:color';
+            @import "./src/assets/styles/presets";
+            @import "./src/assets/styles/mixins";
+            ` + source
+            );
+          },
+        },
+      },
+    },
   };
 });

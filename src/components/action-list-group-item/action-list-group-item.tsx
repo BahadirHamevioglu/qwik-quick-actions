@@ -1,21 +1,23 @@
-import { component$, useStylesScoped$ } from "@builder.io/qwik";
-import { KeyIcon } from "../key-icon/key-icon";
+import {
+  component$, useStylesScoped$
+} from "@builder.io/qwik";
 
 import { ActionListGroupItemForComponentProps } from "../../types/types";
+import { KeyIcon } from "../key-icon/key-icon";
 
 import styles from "./action-list-group-item.scss?inline";
 
 export const ActionListGroupItem = component$(
   (props: ActionListGroupItemForComponentProps) => {
-    const { isFocused } = props;
     useStylesScoped$(styles);
 
     return (
       <div
+        class={[
+          'action-list-group-item',
+          { "action-list-group-item-focused": props.isFocused }
+        ]}
         onClick$={props.onSelect$}
-        class={`
-        action-list-group-item ${isFocused ? "action-list-group-item-focused" : ""}
-        `}
       >
         {props.icon && (
           <div class="action-list-group-item-icon">
