@@ -177,6 +177,9 @@ export const QuickActions = component$<Props>((props) => {
             <ActionListGroupNoResult />
           )}
 
+          {/*
+              Deneme
+            */}
           {/* {searchResults.value.map((result, index) => {
             return (
               <ActionListGroup
