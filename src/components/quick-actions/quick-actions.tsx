@@ -27,10 +27,10 @@ interface GroupFromProps {
 interface Props {
   isOpen?: boolean;
   animation?: "slide" | "none";
-  actionGroups: GroupFromProps[];
+  items: GroupFromProps[];
 }
 
-const formatActionGroups = (actionGroups: Props["actionGroups"]) => {
+const formatActionGroups = (actionGroups: Props["items"]) => {
   let currentIndex = 0;
 
   return {
@@ -51,11 +51,9 @@ export const QuickActions = component$<Props>((props) => {
   useStyles$(globalStyles);
   useStyles$(styles);
 
-  const focusedIndex = useSignal(2);
+  const focusedIndex = useSignal(0);
 
-  const formattedGroups = useComputed$(() =>
-    formatActionGroups(props.actionGroups)
-  );
+  const formattedGroups = useComputed$(() => formatActionGroups(props.items));
 
   const input = useSignal<string>("");
   const searchResults = useSignal<any[]>([]);
@@ -106,6 +104,16 @@ export const QuickActions = component$<Props>((props) => {
           });
         });
       }
+
+      if (event.code === "Enter") {
+        const item = document.querySelector(
+          `[data-index="${focusedIndex.value}"]`
+        );
+
+        if (item) {
+          item.dispatchEvent(new Event("click"));
+        }
+      }
     })
   );
 
@@ -135,7 +143,7 @@ export const QuickActions = component$<Props>((props) => {
     //   parentLabel: item.title
     // })));
 
-    const fuse = new Fuse(props.actionGroups, {
+    const fuse = new Fuse(props.items, {
       keys: ["title", "actions.label"],
       threshold: 0.2,
     });

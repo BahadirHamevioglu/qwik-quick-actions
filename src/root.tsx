@@ -1,4 +1,4 @@
-import { $ } from '@builder.io/qwik';
+import { $ } from "@builder.io/qwik";
 
 import { InfoIcon } from "./components/icons/info-icon/info-icon";
 import { QuickActions } from "./components/quick-actions/quick-actions";
@@ -13,33 +13,43 @@ const DEMO_DATA = [
         label: "Add User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => { })
+        onSelect$: $(() => {
+          console.log("Add user");
+        }),
       },
       {
         label: "Edit User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Edit user");
+        }),
       },
       {
         label: "Delete User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Delete user");
+        }),
       },
       {
         label: "Activate User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Activate user");
+        }),
       },
       {
         label: "Deactivate User",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
-      }
-    ]
+        onSelect$: $(() => {
+          console.log("Deactivate user");
+        }),
+      },
+    ],
   },
   {
     title: "System Settings",
@@ -48,34 +58,44 @@ const DEMO_DATA = [
         label: "Change Theme",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Change theme");
+        }),
       },
       {
         label: "Update Profile",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Update profile");
+        }),
       },
       {
         label: "Change Password",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Change password");
+        }),
       },
       {
         label: "Configure Notifications",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
+        onSelect$: $(() => {
+          console.log("Configure notifications");
+        }),
       },
       {
         label: "System Backup",
         role: "action",
         icon: InfoIcon,
-        onSelect$: $(() => {})
-      }
-    ]
-  }
+        onSelect$: $(() => {
+          console.log("System backup");
+        }),
+      },
+    ],
+  },
 ];
 
 export default () => {
@@ -86,10 +106,7 @@ export default () => {
         <title>Qwik Quick Actions</title>
       </head>
       <body>
-        <QuickActions
-          actionGroups={DEMO_DATA}
-          animationType="slide"
-        />
+        <QuickActions items={DEMO_DATA} animation="slide" />
       </body>
     </>
   );
