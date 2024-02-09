@@ -5,21 +5,21 @@ import {
   useOnWindow,
   useSignal,
   useComputed$,
+  useVisibleTask$
 } from "@builder.io/qwik";
-
 import Fuse from "fuse.js";
 
 import globalStyles from "@/assets/styles/main.scss?inline";
 import { Action } from "@/types/types";
 
 import TransitionIf from "../../utils/transition-if";
-import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
 import { ActionListGroup } from "../action-list-group/action-list-group";
+import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
+import { ActionListGroupTitle } from "../action-list-group-title/action-list-group-title";
 import { TextInput } from "../text-input/text-input";
 
 import styles from "./quick-actions.scss?inline";
-import { ActionListGroupTitle } from "../action-list-group-title/action-list-group-title";
 
 interface GroupFromProps {
   title: string;
@@ -41,11 +41,103 @@ const formatActionGroups = (actionGroups: Props["items"]) => {
         ...group,
         actions: group.actions.map((action) => ({
           ...action,
-          index: currentIndex++,
-        })),
+          index: currentIndex++
+        }))
       };
     }),
-    maxIndex: currentIndex,
+    maxIndex: currentIndex
+  };
+};
+
+const useQuickActions = (props: Props) => {
+  const isOpen = useSignal<boolean>(props.isOpen || true);
+  const focusedIndex = useSignal(0);
+  const formattedGroups = useComputed$(() => formatActionGroups(props.items));
+  const input = useSignal('');
+
+  const onKeydown$ = $((event: KeyboardEvent) => {
+    if (event.metaKey && event.code === "KeyK") {
+      event.preventDefault();
+      isOpen.value = !isOpen.value;
+    }
+
+    if (!isOpen.value) return;
+
+    const SHORTCUT_KEYS = [
+      'Escape',
+      'ArrowDown',
+      'ArrowUp',
+      'Enter'
+    ];
+
+    if (SHORTCUT_KEYS.includes(event.code)) {
+      event.preventDefault();
+    }
+
+    console.log({ code: event.code });
+
+    if (event.code === "Escape") {
+      if (input.value.length > 0) {
+        input.value = "";
+      } else {
+        isOpen.value = false;
+      }
+    }
+
+    if (event.code === "ArrowDown") {
+      focusedIndex.value = Math.min(
+        focusedIndex.value + 1,
+        formattedGroups.value.maxIndex - 1
+      );
+
+      return;
+    }
+
+    if (event.code === "ArrowUp") {
+      focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
+
+      return;
+    }
+
+    if ([
+      "ArrowDown",
+      "ArrowUp"
+    ].includes(event.code)) {
+      setTimeout(() => {
+        const item = document.querySelector(
+          `[data-index="${focusedIndex.value}"]`
+        );
+
+        item?.scrollIntoView({
+          block: "nearest",
+          inline: "center"
+        });
+      });
+    }
+
+    if (event.code === "Enter") {
+      const item = document.querySelector(
+        `[data-index="${focusedIndex.value}"]`
+      );
+
+      if (item) {
+        item.dispatchEvent(new Event("click"));
+      }
+    }
+  });
+
+  /* [WARNING] Replace this part with useOnWindow in next Qwik versions.
+  Currently, when you type something to search, and try to navigate with arrows afterwards, 'keydown' listener is triggered twice while using useOnWindow
+  */
+  useVisibleTask$(() => {
+    window.addEventListener('keydown', onKeydown$);
+  });
+
+  return {
+    isOpen,
+    focusedIndex,
+    input,
+    formattedGroups
   };
 };
 
@@ -53,90 +145,13 @@ export const QuickActions = component$<Props>((props) => {
   useStyles$(globalStyles);
   useStyles$(styles);
 
-  const focusedIndex = useSignal(0);
-
-  const formattedGroups = useComputed$(() => formatActionGroups(props.items));
-
-  const input = useSignal<string>("");
   const searchResults = useSignal<any[]>([]);
 
-  const isOpen = useSignal<boolean>(props.isOpen || true);
   const animation = useSignal<string>(props.animation || "slide");
 
-  useOnWindow(
-    "keydown",
-    $((event) => {
-      console.log("TETİKLENDİM 1");
-      if (event.metaKey && event.code === "KeyK") {
-        event.preventDefault();
-        isOpen.value = !isOpen.value;
-
-        console.log("TETİKLENDİM 2");
-      }
-
-      if (!isOpen.value) return;
-
-      if (event.code === "Escape") {
-        console.log("TETİKLENDİM 3");
-
-        event.preventDefault();
-
-        if (input.value.length > 0) {
-          console.log("TETİKLENDİM 4");
-          input.value = "";
-        } else {
-          console.log("TETİKLENDİM 5");
-          isOpen.value = false;
-        }
-      }
-
-      if (event.code === "ArrowDown") {
-        console.log("TETİKLENDİM 6");
-        focusedIndex.value = Math.min(
-          focusedIndex.value + 1,
-          formattedGroups.value.maxIndex - 1
-        );
-        console.log("TETİKLENDİM 7");
-        return;
-      }
-
-      if (event.code === "ArrowUp") {
-        console.log("TETİKLENDİM 8");
-        focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
-        console.log("TETİKLENDİM 9");
-        return;
-      }
-
-      if (["ArrowDown", "ArrowUp"].includes(event.code)) {
-        setTimeout(() => {
-          console.log("TETİKLENDİM 10");
-          const item = document.querySelector(
-            `[data-index="${focusedIndex.value}"]`
-          );
-          console.log("TETİKLENDİM 11");
-
-          item?.scrollIntoView({
-            block: "nearest",
-            inline: "center",
-          });
-          console.log("TETİKLENDİM 12");
-        });
-      }
-
-      if (event.code === "Enter") {
-        console.log("TETİKLENDİM 13");
-        const item = document.querySelector(
-          `[data-index="${focusedIndex.value}"]`
-        );
-
-        if (item) {
-          item.dispatchEvent(new Event("click"));
-          console.log("TETİKLENDİM 14");
-        }
-        console.log("TETİKLENDİM 15");
-      }
-    })
-  );
+  const {
+    isOpen, focusedIndex, input, formattedGroups
+  } = useQuickActions(props);
 
   useOnWindow(
     "click",
@@ -155,6 +170,7 @@ export const QuickActions = component$<Props>((props) => {
 
     if (input.value.length === 0) {
       searchResults.value = [];
+
       return;
     }
 
@@ -166,16 +182,19 @@ export const QuickActions = component$<Props>((props) => {
       group.actions.flatMap((action) => ({
         ...action,
         index: action.index,
-        focusedIndex: action.index,
+        focusedIndex: action.index
       }))
     );
     const fuse = new Fuse(expandedItems, {
-      keys: ["label", "title"],
-      threshold: 0.2,
+      keys: [
+        "label",
+        "title"
+      ],
+      threshold: 0.2
     });
     const results = fuse.search(input.value).flatMap((result, index) => ({
       ...result.item,
-      index: index,
+      index: index
     }));
 
     searchResults.value = results;
@@ -186,14 +205,17 @@ export const QuickActions = component$<Props>((props) => {
       <TransitionIf
         class={[
           "quick-actions",
-          animation.value ? `quick-actions-animation-${animation.value}` : "",
+          animation.value ? `quick-actions-animation-${animation.value}` : ""
         ]}
         enter="quick-actions-animation-enter"
         exit="quick-actions-animation-exit"
         if={isOpen.value}
       >
         <div class="quick-actions-head">
-          <TextInput value={input.value} onInput$={onInput$} />
+          <TextInput
+            value={input.value}
+            onInput$={onInput$}
+          />
         </div>
         <div class="quick-actions-content">
           {searchResults.value.length === 0 && input.value.length === 0 && (
@@ -219,9 +241,7 @@ export const QuickActions = component$<Props>((props) => {
           {searchResults.value.length > 0 && input.value.length > 0 && (
             <>
               <div class="action-results">
-                <ActionListGroupTitle
-                  title={`Search Results for "${input.value}" (${searchResults.value.length})`}
-                />
+                <ActionListGroupTitle title={`Search Results for "${input.value}" (${searchResults.value.length})`} />
                 {searchResults.value.map((group) => {
                   return (
                     <ActionListGroupItem
