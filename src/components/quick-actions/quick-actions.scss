@@ -30,22 +30,6 @@
     padding: 12px 10px 8px 6px;
 
     @include transition((height));
-
-    & > *:not(:last-child) {
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-      position: relative;
-
-      &::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background-color: var(--stroke-200);
-      }
-    }
   }
 
   &-animation-enter,
@@ -56,4 +40,33 @@
       transform: translateY(10px) scale(0.999) translateX(-50%);
     }
   }
+}
+
+.action-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+
+  & > *:not(:last-child) {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: var(--stroke-200);
+    }
+  }
+}
+
+.action-results {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
