@@ -10,7 +10,7 @@ import styles from "./action-list-group-item.scss?inline";
 
 interface Props extends Action {
   isFocused?: boolean;
-  subItemsArray?: (subItems: Action[]) => void; // Ensure this is a function type
+  subItemsArray?: any;
 }
 
 export const ActionListGroupItem = component$((props: Props) => {
@@ -31,7 +31,7 @@ export const ActionListGroupItem = component$((props: Props) => {
         { "action-list-group-item-focused": props.isFocused }
       ]}
       data-index={props.index}
-      onClick$={(handleItemClick$)}
+      onClick$={handleItemClick$}
     >
       {props.icon && (
         <div class="action-list-group-item-icon">
