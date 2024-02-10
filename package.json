@@ -23,7 +23,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "build": "qwik build",
+    "build": "qwik build --output dist",
     "build.lib": "vite build --mode lib",
     "build.types": "tsc --emitDeclarationOnly",
     "dev": "vite --mode ssr",
