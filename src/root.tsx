@@ -33,7 +33,7 @@ const DEMO_DATA = [
                 onSelect$: $(() => {
                   console.log("Add standard user with limited access");
                 }),
-                index: 0,
+                index: 0
               },
               {
                 label: "Standard User with full access",
@@ -42,9 +42,9 @@ const DEMO_DATA = [
                 onSelect$: $(() => {
                   console.log("Add standard user with full access");
                 }),
-                index: 1,
-              },
-            ],
+                index: 1
+              }
+            ]
           },
           {
             label: "Admin User",
@@ -62,7 +62,7 @@ const DEMO_DATA = [
                 onSelect$: $(() => {
                   console.log("Add admin user with all permissions");
                 }),
-                index: 0,
+                index: 0
               },
               {
                 label: "Admin User with limited permissions",
@@ -71,9 +71,9 @@ const DEMO_DATA = [
                 onSelect$: $(() => {
                   console.log("Add admin user with limited permissions");
                 }),
-                index: 1,
-              },
-            ],
+                index: 1
+              }
+            ]
           },
           {
             label: "Guest User",
@@ -91,11 +91,11 @@ const DEMO_DATA = [
                 onSelect$: $(() => {
                   console.log("Add guest user with read-only access");
                 }),
-                index: 0,
-              },
-            ],
-          },
-        ],
+                index: 0
+              }
+            ]
+          }
+        ]
       },
       {
         label: "Edit User",
@@ -103,7 +103,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Edit user");
-        }),
+        })
       },
       {
         label: "Delete User",
@@ -111,7 +111,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Delete user");
-        }),
+        })
       },
       {
         label: "Activate User",
@@ -119,7 +119,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Activate user");
-        }),
+        })
       },
       {
         label: "Deactivate User",
@@ -127,9 +127,9 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Deactivate user");
-        }),
-      },
-    ],
+        })
+      }
+    ]
   },
   {
     title: "System Settings",
@@ -140,7 +140,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Change theme");
-        }),
+        })
       },
       {
         label: "Update Profile",
@@ -148,7 +148,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Update profile");
-        }),
+        })
       },
       {
         label: "Change Password",
@@ -156,7 +156,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Change password");
-        }),
+        })
       },
       {
         label: "Configure Notifications",
@@ -164,7 +164,7 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("Configure notifications");
-        }),
+        })
       },
       {
         label: "System Backup",
@@ -172,10 +172,10 @@ const DEMO_DATA = [
         icon: InfoIcon,
         onSelect$: $(() => {
           console.log("System backup");
-        }),
-      },
-    ],
-  },
+        })
+      }
+    ]
+  }
 ];
 
 export default () => {
@@ -186,7 +186,10 @@ export default () => {
         <title>Qwik Quick Actions</title>
       </head>
       <body>
-        <QuickActions items={DEMO_DATA} animation="slide" />
+        <QuickActions
+          animation="slide"
+          items={DEMO_DATA}
+        />
       </body>
     </>
   );

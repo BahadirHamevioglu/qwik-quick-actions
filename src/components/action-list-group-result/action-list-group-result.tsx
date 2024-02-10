@@ -1,4 +1,6 @@
-import { component$, useStylesScoped$ } from "@builder.io/qwik";
+import {
+  component$, useStylesScoped$
+} from "@builder.io/qwik";
 
 import { Group } from "../../types/types";
 import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
