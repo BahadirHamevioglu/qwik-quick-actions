@@ -18,34 +18,82 @@ const DEMO_DATA = [
         }),
         subItems: [
           {
-            label: "Admin",
+            label: "Standard User",
             role: "action",
             icon: InfoIcon,
             onSelect$: $(() => {
-              console.log("Add admin user");
+              console.log("Add standard user");
             }),
             index: 0,
-
             subItems: [
               {
-                label: "Admin",
+                label: "Standard User with limited access",
                 role: "action",
                 icon: InfoIcon,
                 onSelect$: $(() => {
-                  console.log("Add admin user");
+                  console.log("Add standard user with limited access");
                 }),
                 index: 0,
+              },
+              {
+                label: "Standard User with full access",
+                role: "action",
+                icon: InfoIcon,
+                onSelect$: $(() => {
+                  console.log("Add standard user with full access");
+                }),
+                index: 1,
               },
             ],
           },
           {
-            label: "Admin",
+            label: "Admin User",
             role: "action",
             icon: InfoIcon,
             onSelect$: $(() => {
               console.log("Add admin user");
             }),
             index: 1,
+            subItems: [
+              {
+                label: "Admin User with all permissions",
+                role: "action",
+                icon: InfoIcon,
+                onSelect$: $(() => {
+                  console.log("Add admin user with all permissions");
+                }),
+                index: 0,
+              },
+              {
+                label: "Admin User with limited permissions",
+                role: "action",
+                icon: InfoIcon,
+                onSelect$: $(() => {
+                  console.log("Add admin user with limited permissions");
+                }),
+                index: 1,
+              },
+            ],
+          },
+          {
+            label: "Guest User",
+            role: "action",
+            icon: InfoIcon,
+            onSelect$: $(() => {
+              console.log("Add guest user");
+            }),
+            index: 2,
+            subItems: [
+              {
+                label: "Guest User with read-only access",
+                role: "action",
+                icon: InfoIcon,
+                onSelect$: $(() => {
+                  console.log("Add guest user with read-only access");
+                }),
+                index: 0,
+              },
+            ],
           },
         ],
       },

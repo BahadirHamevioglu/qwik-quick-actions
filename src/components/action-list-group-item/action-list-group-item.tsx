@@ -8,11 +8,23 @@ import styles from "./action-list-group-item.scss?inline";
 
 interface Props extends Action {
   isFocused?: boolean;
-  subItemsArray?: (subItems: Action[]) => void; // Ensure this is a function type
+  subItemsArray?: (subItems: Action[], newBreadCrumbs: string[]) => void; // Ensure this is a function type
 }
 
 export const ActionListGroupItem = component$((props: Props) => {
   useStylesScoped$(styles);
+
+  const handleItemClick$ = $(() => {
+    if (props.subItems) {
+      const newBreadCrumbs = props.breadCrumbs
+        ? [...props.breadCrumbs, props.label]
+        : [props.label];
+      props.subItemsArray &&
+        props.subItemsArray(props.subItems, newBreadCrumbs);
+    } else {
+      props.onSelect$ && props.onSelect$();
+    }
+  });
 
   return (
     <div
@@ -21,13 +33,7 @@ export const ActionListGroupItem = component$((props: Props) => {
         { "action-list-group-item-focused": props.isFocused },
       ]}
       data-index={props.index}
-      onClick$={$(() => {
-        if (props.subItems) {
-          props.subItemsArray && props.subItemsArray(props.subItems);
-        } else {
-          props.onSelect$ && props.onSelect$();
-        }
-      })}
+      onClick$={handleItemClick$}
     >
       {props.icon && (
         <div class="action-list-group-item-icon">

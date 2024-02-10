@@ -12,6 +12,7 @@ export interface Action {
   onSelect$?: QRL<() => void>;
   index: number;
   subItems?: Action[];
+  breadCrumbs?: string[];
 }
 
 // key-icon.tsx

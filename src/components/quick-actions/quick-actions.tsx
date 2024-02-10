@@ -7,10 +7,11 @@ import {
   useComputed$,
   useVisibleTask$,
 } from "@builder.io/qwik";
+
 import Fuse from "fuse.js";
 
 import globalStyles from "@/assets/styles/main.scss?inline";
-import { Action } from "@/types/types";
+import { Action, Group } from "@/types/types";
 
 import TransitionIf from "../../utils/transition-if";
 import { ActionListGroup } from "../action-list-group/action-list-group";
@@ -57,6 +58,7 @@ const useQuickActions = (props: Props) => {
   const animation = useSignal<string>(props.animation || "slide");
   const searchResults = useSignal<any[]>([]);
   const subItemsArray = useSignal<any[]>([]);
+  const breadCrumbs = useSignal<string[]>([]);
 
   const onKeydown$ = $((event: KeyboardEvent) => {
     if (event.metaKey && event.code === "KeyK") {
@@ -76,6 +78,7 @@ const useQuickActions = (props: Props) => {
       if (input.value.length > 0) {
         input.value = "";
       } else {
+        subItemsArray.value = [];
         isOpen.value = false;
       }
     }
@@ -84,15 +87,16 @@ const useQuickActions = (props: Props) => {
       const maxIndex =
         searchResults.value.length > 0
           ? searchResults.value.length - 1
-          : formattedGroups.value.maxIndex - 1;
+          : subItemsArray.value.length > 0
+            ? subItemsArray.value[subItemsArray.value.length - 1].length - 1
+            : formattedGroups.value.maxIndex - 1;
       focusedIndex.value = Math.min(focusedIndex.value + 1, maxIndex);
-
-      console.log(formattedGroups.value.items);
       return;
     }
 
     if (event.code === "ArrowUp") {
       focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
+      console.log(focusedIndex.value);
       return;
     }
 
@@ -135,6 +139,7 @@ const useQuickActions = (props: Props) => {
     animation,
     searchResults,
     subItemsArray,
+    breadCrumbs,
   };
 };
 
@@ -150,6 +155,7 @@ export const QuickActions = component$<Props>((props) => {
     animation,
     searchResults,
     subItemsArray,
+    breadCrumbs,
   } = useQuickActions(props);
 
   useOnWindow(
@@ -159,6 +165,7 @@ export const QuickActions = component$<Props>((props) => {
 
       if (!target.closest(".quick-actions") && isOpen.value) {
         isOpen.value = false;
+        subItemsArray.value = [];
       }
     })
   );
@@ -177,12 +184,18 @@ export const QuickActions = component$<Props>((props) => {
       focusedIndex.value = 0;
     }
 
-    const expandedItems = formattedGroups.value.items.flatMap((group) =>
-      group.actions.flatMap((action) => ({
-        ...action,
-        index: action.index,
-        focusedIndex: action.index,
-      }))
+    const selectedArray =
+      subItemsArray.value.length >= 1
+        ? subItemsArray.value
+        : formattedGroups.value?.items;
+
+    const expandedItems = selectedArray.flatMap((group: Group) =>
+      "actions" in group
+        ? group.actions.map((action: Action) => ({
+            ...action,
+            focusedIndex: focusedIndex.value,
+          }))
+        : []
     );
     const fuse = new Fuse(expandedItems, {
       keys: ["label", "title"],
@@ -194,14 +207,40 @@ export const QuickActions = component$<Props>((props) => {
     }));
 
     searchResults.value = results;
-    console.log(results);
   });
 
-  const handleSubItemsArray = $((subItems: Action[]) => {
-    searchResults.value = [];
-    subItemsArray.value = subItems;
+  // Bu fonksiyon, yeni subItems array'ini mevcut subItemsArray.value'ye ekler
+  const updateSubItemsArray = $((subItems: Action[]) => {
+    const newArray = subItems.map((item, index) => ({
+      ...item,
+      index,
+    }));
+
+    if (!Array.isArray(subItemsArray.value)) {
+      subItemsArray.value = [];
+    }
+
+    subItemsArray.value = [...subItemsArray.value, newArray]; // Güncellenmiş kod
+    focusedIndex.value = 0;
+
     console.log(subItemsArray.value);
   });
+
+  // Bu fonksiyon, yeni breadcrumbs ve subItems'ları işler
+  const handleSubItemsArray = $(
+    (subItems: Action[], newBreadCrumbs: string[]) => {
+      searchResults.value = [];
+      updateSubItemsArray(subItems);
+      breadCrumbs.value = newBreadCrumbs;
+      focusedIndex.value = 0;
+    }
+  );
+
+  const backToPreviousSubItems = $(() => {
+    subItemsArray.value = subItemsArray.value.slice(0, -1);
+    breadCrumbs.value = breadCrumbs.value.slice(0, -1);
+  });
+
   return (
     <TransitionIf
       class={[
@@ -216,28 +255,24 @@ export const QuickActions = component$<Props>((props) => {
         <TextInput value={input.value} onInput$={onInput$} />
       </div>
       <div class="quick-actions-content">
-        {searchResults.value.length === 0 &&
-          input.value.length === 0 &&
-          subItemsArray.value.length === 0 && (
-            <>
+        {searchResults.value.length === 0 && (
+          <>
+            {input.value.length === 0 && subItemsArray.value.length === 0 ? (
               <div class="action-groups">
-                {formattedGroups.value.items.map((group, index) => {
-                  return (
-                    <ActionListGroup
-                      {...group}
-                      focusedIndex={focusedIndex.value}
-                      key={group.title + index}
-                      subItemsArray={handleSubItemsArray}
-                    />
-                  );
-                })}
+                {formattedGroups.value.items.map((group, index) => (
+                  <ActionListGroup
+                    {...group}
+                    focusedIndex={focusedIndex.value}
+                    key={group.title + index}
+                    subItemsArray={handleSubItemsArray}
+                  />
+                ))}
               </div>
-            </>
-          )}
-
-        {searchResults.value.length === 0 &&
-          input.value.length > 0 &&
-          subItemsArray.value.length === 0 && <ActionListGroupNoResult />}
+            ) : input.value.length > 0 && subItemsArray.value.length === 0 ? (
+              <ActionListGroupNoResult />
+            ) : null}
+          </>
+        )}
 
         {searchResults.value.length > 0 &&
           input.value.length > 0 &&
@@ -246,48 +281,40 @@ export const QuickActions = component$<Props>((props) => {
               <ActionListGroupTitle
                 title={`Search Results for "${input.value}" (${searchResults.value.length})`}
               />
-              {searchResults.value.map((group) => {
-                {
-                  /* [WARNING] I don't why but when i want to use ... (seperator) JSX says you cannot use objects. */
-                }
-                return (
-                  <ActionListGroupItem
-                    isFocused={focusedIndex.value === group.index}
-                    key={group.label + group.index}
-                    label={group.label}
-                    icon={group.icon}
-                    onSelect$={group.onSelect$}
-                    index={group.index}
-                    subItems={group.subItems}
-                    role={group.role}
-                    subItemsArray={handleSubItemsArray}
-                  />
-                );
-              })}
+              {searchResults.value.map((result) => (
+                <ActionListGroupItem
+                  {...result}
+                  isFocused={focusedIndex.value === result.index}
+                  key={result.label + result.index}
+                  subItemsArray={handleSubItemsArray}
+                />
+              ))}
             </div>
           )}
 
         {subItemsArray.value.length > 0 && (
           <div class="action-results">
-            <ActionListGroupTitle title="Sub Items" />
-            {subItemsArray.value.map((group) => {
-              {
-                /* [WARNING] I don't why but when i want to use ... (seperator) JSX says you cannot use objects. */
-              }
-              return (
-                <ActionListGroupItem
-                  isFocused={focusedIndex.value === group.index}
-                  key={group.label + group.index}
-                  label={group.label}
-                  icon={group.icon}
-                  onSelect$={group.onSelect$}
-                  index={group.index}
-                  subItems={group.subItems}
-                  role={group.role}
-                  subItemsArray={handleSubItemsArray}
+            <div class="breadcrumbs">
+              {breadCrumbs.value.map((crumb, index) => (
+                <ActionListGroupTitle
+                  title={`${crumb} (${subItemsArray.value.length})`}
+                  key={`breadcrumb-${index}`}
                 />
-              );
-            })}
+              ))}
+            </div>
+
+            <button onClick$={backToPreviousSubItems}>Back</button>
+
+            {subItemsArray.value[subItemsArray.value.length - 1]?.map(
+              (subItem: Action, subItemIndex: number) => (
+                <ActionListGroupItem
+                  {...subItem}
+                  isFocused={focusedIndex.value === subItem.index}
+                  subItemsArray={handleSubItemsArray}
+                  key={subItem.label + subItemIndex}
+                />
+              )
+            )}
           </div>
         )}
       </div>

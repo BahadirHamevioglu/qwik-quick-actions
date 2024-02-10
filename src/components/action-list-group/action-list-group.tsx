@@ -8,7 +8,8 @@ import styles from "./action-list-group.scss?inline";
 
 interface Props extends Group {
   focusedIndex: number;
-  subItemsArray?: (subItems: Action[]) => void;
+  // subItemsArray fonksiyonunun iki parametre alacak şekilde güncellenmiş hali
+  subItemsArray?: (subItems: Action[], newBreadcrumbs: string[]) => void;
 }
 
 export const ActionListGroup = component$<Props>((props) => {
@@ -21,19 +22,14 @@ export const ActionListGroup = component$<Props>((props) => {
         return (
           <ActionListGroupItem
             key={item.label}
-            label={item.label}
-            icon={item.icon}
-            onSelect$={item.onSelect$}
-            index={item.index}
-            subItems={item.subItems}
             isFocused={props.focusedIndex === item.index}
-            role={item.role}
+            {...item}
+            // subItemsArray fonksiyonunu güncelleyerek iki parametre alacak şekilde düzenleme
             subItemsArray={
-              props.subItemsArray
-                ? $((subItems: Action[]) => {
-                    props.subItemsArray!(subItems);
-                  })
-                : undefined
+              props.subItemsArray ??
+              $((subItems: Action[], newBreadcrumbs: string[]) => {
+                props.subItemsArray!(subItems, newBreadcrumbs);
+              })
             }
           />
         );
