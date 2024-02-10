@@ -15,8 +15,7 @@
   },
   "files": [
     "lib",
-    "lib-types",
-    "dist"
+    "lib-types"
   ],
   "engines": {
     "node": ">=15.0.0"
