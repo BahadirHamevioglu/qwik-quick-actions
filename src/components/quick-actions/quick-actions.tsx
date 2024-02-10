@@ -56,6 +56,7 @@ const useQuickActions = (props: Props) => {
   const input = useSignal("");
   const animation = useSignal<string>(props.animation || "slide");
   const searchResults = useSignal<any[]>([]);
+  const subItemsArray = useSignal<any[]>([]);
 
   const onKeydown$ = $((event: KeyboardEvent) => {
     if (event.metaKey && event.code === "KeyK") {
@@ -85,6 +86,8 @@ const useQuickActions = (props: Props) => {
           ? searchResults.value.length - 1
           : formattedGroups.value.maxIndex - 1;
       focusedIndex.value = Math.min(focusedIndex.value + 1, maxIndex);
+
+      console.log(formattedGroups.value.items);
       return;
     }
 
@@ -131,6 +134,7 @@ const useQuickActions = (props: Props) => {
     formattedGroups,
     animation,
     searchResults,
+    subItemsArray,
   };
 };
 
@@ -145,6 +149,7 @@ export const QuickActions = component$<Props>((props) => {
     formattedGroups,
     animation,
     searchResults,
+    subItemsArray,
   } = useQuickActions(props);
 
   useOnWindow(
@@ -189,10 +194,14 @@ export const QuickActions = component$<Props>((props) => {
     }));
 
     searchResults.value = results;
-
-    console.log({ results });
+    console.log(results);
   });
 
+  const handleSubItemsArray = $((subItems: Action[]) => {
+    searchResults.value = [];
+    subItemsArray.value = subItems;
+    console.log(subItemsArray.value);
+  });
   return (
     <TransitionIf
       class={[
@@ -207,43 +216,79 @@ export const QuickActions = component$<Props>((props) => {
         <TextInput value={input.value} onInput$={onInput$} />
       </div>
       <div class="quick-actions-content">
-        {searchResults.value.length === 0 && input.value.length === 0 && (
-          <>
-            <div class="action-groups">
-              {formattedGroups.value.items.map((group, index) => {
-                return (
-                  <ActionListGroup
-                    {...group}
-                    focusedIndex={focusedIndex.value}
-                    key={group.title + index}
-                  />
-                );
-              })}
-            </div>
-          </>
-        )}
+        {searchResults.value.length === 0 &&
+          input.value.length === 0 &&
+          subItemsArray.value.length === 0 && (
+            <>
+              <div class="action-groups">
+                {formattedGroups.value.items.map((group, index) => {
+                  return (
+                    <ActionListGroup
+                      {...group}
+                      focusedIndex={focusedIndex.value}
+                      key={group.title + index}
+                      subItemsArray={handleSubItemsArray}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
 
-        {searchResults.value.length === 0 && input.value.length > 0 && (
-          <ActionListGroupNoResult />
-        )}
+        {searchResults.value.length === 0 &&
+          input.value.length > 0 &&
+          subItemsArray.value.length === 0 && <ActionListGroupNoResult />}
 
-        {searchResults.value.length > 0 && input.value.length > 0 && (
-          <>
+        {searchResults.value.length > 0 &&
+          input.value.length > 0 &&
+          subItemsArray.value.length === 0 && (
             <div class="action-results">
               <ActionListGroupTitle
                 title={`Search Results for "${input.value}" (${searchResults.value.length})`}
               />
               {searchResults.value.map((group) => {
+                {
+                  /* [WARNING] I don't why but when i want to use ... (seperator) JSX says you cannot use objects. */
+                }
                 return (
                   <ActionListGroupItem
-                    {...group}
                     isFocused={focusedIndex.value === group.index}
                     key={group.label + group.index}
+                    label={group.label}
+                    icon={group.icon}
+                    onSelect$={group.onSelect$}
+                    index={group.index}
+                    subItems={group.subItems}
+                    role={group.role}
+                    subItemsArray={handleSubItemsArray}
                   />
                 );
               })}
             </div>
-          </>
+          )}
+
+        {subItemsArray.value.length > 0 && (
+          <div class="action-results">
+            <ActionListGroupTitle title="Sub Items" />
+            {subItemsArray.value.map((group) => {
+              {
+                /* [WARNING] I don't why but when i want to use ... (seperator) JSX says you cannot use objects. */
+              }
+              return (
+                <ActionListGroupItem
+                  isFocused={focusedIndex.value === group.index}
+                  key={group.label + group.index}
+                  label={group.label}
+                  icon={group.icon}
+                  onSelect$={group.onSelect$}
+                  index={group.index}
+                  subItems={group.subItems}
+                  role={group.role}
+                  subItemsArray={handleSubItemsArray}
+                />
+              );
+            })}
+          </div>
         )}
       </div>
     </TransitionIf>

@@ -16,6 +16,38 @@ const DEMO_DATA = [
         onSelect$: $(() => {
           console.log("Add user");
         }),
+        subItems: [
+          {
+            label: "Admin",
+            role: "action",
+            icon: InfoIcon,
+            onSelect$: $(() => {
+              console.log("Add admin user");
+            }),
+            index: 0,
+
+            subItems: [
+              {
+                label: "Admin",
+                role: "action",
+                icon: InfoIcon,
+                onSelect$: $(() => {
+                  console.log("Add admin user");
+                }),
+                index: 0,
+              },
+            ],
+          },
+          {
+            label: "Admin",
+            role: "action",
+            icon: InfoIcon,
+            onSelect$: $(() => {
+              console.log("Add admin user");
+            }),
+            index: 1,
+          },
+        ],
       },
       {
         label: "Edit User",

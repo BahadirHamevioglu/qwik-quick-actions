@@ -1,6 +1,4 @@
-import {
-  Component, QRL
-} from "@builder.io/qwik";
+import { Component, QRL } from "@builder.io/qwik";
 
 export interface Group {
   title: string;
@@ -13,6 +11,7 @@ export interface Action {
   icon: Component<object>;
   onSelect$?: QRL<() => void>;
   index: number;
+  subItems?: Action[];
 }
 
 // key-icon.tsx
