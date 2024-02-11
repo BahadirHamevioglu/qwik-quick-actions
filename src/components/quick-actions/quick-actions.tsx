@@ -19,6 +19,7 @@ import { ActionListGroup } from "../action-list-group/action-list-group";
 import { ActionListGroupItem } from "../action-list-group-item/action-list-group-item";
 import { ActionListGroupNoResult } from "../action-list-group-no-result/action-list-group-no-result";
 import { ActionListGroupTitle } from "../action-list-group-title/action-list-group-title";
+import { Breadcrumb } from "../breadcrumb/breadcrumb";
 import { TextInput } from "../text-input/text-input";
 
 import styles from "./quick-actions.scss?inline";
@@ -225,6 +226,22 @@ export const QuickActions = component$<Props>((props) => {
     searchResults.value = results;
   });
 
+  const updateBreadCrumbs = $((newCrumb: string) => {
+    // Check if the new crumb already exists in the breadcrumbs array
+    const crumbIndex = breadCrumbs.value.indexOf(newCrumb);
+
+    if (crumbIndex === -1) {
+      // If the crumb does not exist, add it to the end of the breadcrumbs array
+      breadCrumbs.value = [
+        ...breadCrumbs.value,
+        newCrumb
+      ];
+    } else {
+      // If the crumb already exists, remove all crumbs after it
+      breadCrumbs.value = breadCrumbs.value.slice(0, crumbIndex + 1);
+    }
+  });
+
   // Bu fonksiyon, yeni subItems array'ini mevcut subItemsArray.value'ye ekler
   const updateSubItemsArray = $((subItems: Action[]) => {
     const newArray = subItems.map((item, index) => ({
@@ -239,7 +256,7 @@ export const QuickActions = component$<Props>((props) => {
     subItemsArray.value = [
       ...subItemsArray.value,
       newArray
-    ]; // Güncellenmiş kod
+    ];
     focusedIndex.value = 0;
 
     console.log(subItemsArray.value);
@@ -249,8 +266,8 @@ export const QuickActions = component$<Props>((props) => {
   const handleSubItemsArray = $(
     (subItems: Action[]) => {
       searchResults.value = [];
+      updateBreadCrumbs(subItems[0].label);
       updateSubItemsArray(subItems);
-      breadCrumbs.value = [];
       focusedIndex.value = 0;
     }
   );
@@ -314,16 +331,12 @@ export const QuickActions = component$<Props>((props) => {
 
         {subItemsArray.value.length > 0 && (
           <div class="action-results">
-            <div class="breadcrumbs">
-              {breadCrumbs.value.map((crumb, index) => (
-                <ActionListGroupTitle
-                  key={`breadcrumb-${index}`}
-                  title={`${crumb} (${subItemsArray.value.length})`}
-                />
-              ))}
-            </div>
 
-            <button onClick$={backToPreviousSubItems}>Back</button>
+            <Breadcrumb
+              items={breadCrumbs.value}
+              key={breadCrumbs.value.join('-')}
+              onClick$={backToPreviousSubItems}
+            />
 
             {subItemsArray.value[subItemsArray.value.length - 1]?.map(
               (subItem: Action, subItemIndex: number) => (

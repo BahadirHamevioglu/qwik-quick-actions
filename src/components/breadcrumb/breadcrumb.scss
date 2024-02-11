@@ -1,0 +1,36 @@
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 0 6px;
+    margin-bottom: 8px;
+
+    &-item {
+        color: var(--text-500);
+        @extend %label-small;
+
+        &:hover {
+            color: var(--text-900);
+            cursor: pointer;
+        }
+    }
+
+    & > *:not(:last-child) {
+        pointer-events: none;
+        &::after {
+            content: "/";
+            color: var(--icon-300);
+            @extend %label-small;
+            padding: 0 0.5rem;
+        }
+    }
+
+    & > *:last-child {
+        color: var(--text-900);
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
