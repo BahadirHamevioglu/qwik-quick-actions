@@ -11,17 +11,22 @@ import styles from "./action-list-group-item.scss?inline";
 interface Props extends Action {
   isFocused?: boolean;
   subItemsArray?: any;
+  breadCrumbTitle?: any;
 }
-
 export const ActionListGroupItem = component$((props: Props) => {
   const {
-    subItems, subItemsArray, onSelect$
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    subItems, subItemsArray, onSelect$, breadCrumbTitle = props.label
   } = props;
 
   useStylesScoped$(styles);
 
   const handleItemClick$ = $(() => {
-    subItems ? subItemsArray && subItemsArray(subItems) : onSelect$ && onSelect$();
+    if (subItems) {
+      subItemsArray(subItems);
+    } else {
+      onSelect$?.();
+    }
   });
 
   return (

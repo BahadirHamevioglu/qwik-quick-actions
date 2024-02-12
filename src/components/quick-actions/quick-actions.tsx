@@ -99,14 +99,12 @@ const useQuickActions = (props: Props) => {
           ? subItemsArray.value[subItemsArray.value.length - 1].length - 1
           : formattedGroups.value.maxIndex - 1;
       focusedIndex.value = Math.min(focusedIndex.value + 1, maxIndex);
-      console.log(focusedIndex.value);
 
       return;
     }
 
     if (event.code === "ArrowUp") {
       focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
-      console.log(focusedIndex.value);
 
       return;
     }
@@ -180,6 +178,8 @@ export const QuickActions = component$<Props>((props) => {
       if (!target.closest(".quick-actions") && isOpen.value) {
         isOpen.value = false;
         subItemsArray.value = [];
+        input.value = "";
+        searchResults.value = [];
       }
     })
   );
@@ -194,23 +194,18 @@ export const QuickActions = component$<Props>((props) => {
       return;
     }
 
-    if (input.value.length > 0) {
-      focusedIndex.value = 0;
-    }
+    focusedIndex.value = 0;
 
-    const selectedArray =
-      subItemsArray.value.length >= 1
-        ? subItemsArray.value
-        : formattedGroups.value!.items;
-
-    const expandedItems = selectedArray.flatMap((group: Group) =>
-      "actions" in group
-        ? group.actions.map((action: Action) => ({
+    // Eğer subItemsArray içindeysek, onu arama sonuçlarına dahil et
+    const expandedItems = subItemsArray.value.length > 0
+      ? subItemsArray.value
+      : formattedGroups.value!.items.flatMap((group: Group) =>
+        group.actions.map((action: Action) => ({
           ...action,
           focusedIndex: focusedIndex.value
         }))
-        : []
-    );
+      );
+
     const fuse = new Fuse(expandedItems, {
       keys: [
         "label",
@@ -218,7 +213,8 @@ export const QuickActions = component$<Props>((props) => {
       ],
       threshold: 0.2
     });
-    const results = fuse.search(input.value).flatMap((result, index) => ({
+
+    const results = fuse.search(input.value).map((result, index) => (console.log({ result }), {
       ...result.item,
       index: index
     }));
@@ -226,6 +222,7 @@ export const QuickActions = component$<Props>((props) => {
     searchResults.value = results;
   });
 
+  // Bu fonksiyon, yeni crumb'ları işler
   const updateBreadCrumbs = $((newCrumb: string) => {
     // Check if the new crumb already exists in the breadcrumbs array
     const crumbIndex = breadCrumbs.value.indexOf(newCrumb);
@@ -258,8 +255,6 @@ export const QuickActions = component$<Props>((props) => {
       newArray
     ];
     focusedIndex.value = 0;
-
-    console.log(subItemsArray.value);
   });
 
   // Bu fonksiyon, yeni breadcrumbs ve subItems'ları işler
@@ -329,7 +324,11 @@ export const QuickActions = component$<Props>((props) => {
           </div>
         )}
 
-        {subItemsArray.value.length > 0 && (
+        {subItemsArray.value.length === 0 && searchResults.value.length === 0 && input.value.length > 0 && (
+          <ActionListGroupNoResult />
+        )}
+
+        {subItemsArray.value.length > 0 && searchResults.value.length === 0 && (
           <div class="action-results">
 
             <Breadcrumb

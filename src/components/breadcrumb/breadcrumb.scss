@@ -3,13 +3,18 @@
     align-items: center;
     justify-content: flex-start;
 
+    flex-wrap: wrap;
+    flex-shrink: 0;
+
     padding: 0 6px;
     margin-bottom: 8px;
 
+    width: 100%;
+
     &-item {
         color: var(--text-500);
-        @extend %label-small;
-
+        @extend %subheading-xx-small;
+        overflow-x: auto;
         &:hover {
             color: var(--text-900);
             cursor: pointer;
@@ -21,7 +26,7 @@
         &::after {
             content: "/";
             color: var(--icon-300);
-            @extend %label-small;
+            @extend %subheading-xx-small;
             padding: 0 0.5rem;
         }
     }
